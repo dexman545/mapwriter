@@ -1,18 +1,17 @@
 package dex.mapwriter3.api;
 
-import java.awt.Point;
+import java.awt.*;
 
-public interface IMwChunkOverlay
-{
-	public Point getCoordinates();
+public interface IMwChunkOverlay {
+    public Point getCoordinates();
 
-	public int getColor();
+    public int getColor();
 
-	public float getFilling();
+    public float getFilling();
 
-	public boolean hasBorder();
+    public boolean hasBorder();
 
-	public float getBorderWidth();
+    public float getBorderWidth();
 
-	public int getBorderColor();
+    public int getBorderColor();
 }

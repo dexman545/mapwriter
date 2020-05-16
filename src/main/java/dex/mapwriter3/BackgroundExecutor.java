@@ -1,5 +1,8 @@
 package dex.mapwriter3;
 
+import dex.mapwriter3.tasks.Task;
+import dex.mapwriter3.util.Logging;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -7,9 +10,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
-import dex.mapwriter3.tasks.Task;
-import dex.mapwriter3.util.Logging;
 
 // @formatter:off
 /*
@@ -47,147 +47,116 @@ import dex.mapwriter3.util.Logging;
  * 	  Task3.onComplete()
  */
 
-public class BackgroundExecutor
-{
+public class BackgroundExecutor {
 
-	private ExecutorService executor;
-	private LinkedList<Task> taskQueue;
-	public boolean closed = false;
-	private boolean doDiag = true;
+    private ExecutorService executor;
+    private LinkedList<Task> taskQueue;
+    public boolean closed = false;
+    private boolean doDiag = true;
 
-	public BackgroundExecutor()
-	{
-		this.executor = Executors.newSingleThreadExecutor();
-		this.taskQueue = new LinkedList<Task>();
-	}
+    public BackgroundExecutor() {
+        this.executor = Executors.newSingleThreadExecutor();
+        this.taskQueue = new LinkedList<Task>();
+    }
 
-	// add a task to the queue
-	public boolean addTask(Task task)
-	{
-		if (!this.closed)
-		{
-			if (!task.CheckForDuplicate())
-			{
-				Future<?> future = this.executor.submit(task);
-				task.setFuture(future);
-				this.taskQueue.add(task);
-			}
+    // add a task to the queue
+    public boolean addTask(Task task) {
+        if (!this.closed) {
+            if (!task.CheckForDuplicate()) {
+                Future<?> future = this.executor.submit(task);
+                task.setFuture(future);
+                this.taskQueue.add(task);
+            }
 
-			//bit for diagnostics on task left to optimize code
-			if ((this.tasksRemaining() > 500) && this.doDiag)
-			{
-				this.doDiag = false;
-				Logging.logError("Taskque went over 500 starting diagnostic");
-				this.taskLeftPerType();
-				Logging.logError("End of diagnostic");
-			}
-			else
-			{
-				this.doDiag = true;
-			}
-		}
-		else
-		{
-			Logging.log("MwExecutor.addTask: error: cannot add task to closed executor");
-		}
-		return this.closed;
-	}
+            //bit for diagnostics on task left to optimize code
+            if ((this.tasksRemaining() > 500) && this.doDiag) {
+                this.doDiag = false;
+                Logging.logError("Taskque went over 500 starting diagnostic");
+                this.taskLeftPerType();
+                Logging.logError("End of diagnostic");
+            } else {
+                this.doDiag = true;
+            }
+        } else {
+            Logging.log("MwExecutor.addTask: error: cannot add task to closed executor");
+        }
+        return this.closed;
+    }
 
-	// Pop a Task entry from the task queue and check if the task's thread has
-	// finished.
-	// If it has completed then call onComplete for the task.
-	// If it has not completed then push the task back on the queue.
-	public boolean processTaskQueue()
-	{
-		boolean processed = false;
-		Task task = this.taskQueue.poll();
-		if (task != null)
-		{
-			if (task.isDone())
-			{
-				task.printException();
-				task.onComplete();
+    // Pop a Task entry from the task queue and check if the task's thread has
+    // finished.
+    // If it has completed then call onComplete for the task.
+    // If it has not completed then push the task back on the queue.
+    public boolean processTaskQueue() {
+        boolean processed = false;
+        Task task = this.taskQueue.poll();
+        if (task != null) {
+            if (task.isDone()) {
+                task.printException();
+                task.onComplete();
 
-				processed = true;
-			}
-			else
-			{
-				// put entry back on top of queue
-				this.taskQueue.push(task);
-			}
-		}
-		return !processed;
-	}
+                processed = true;
+            } else {
+                // put entry back on top of queue
+                this.taskQueue.push(task);
+            }
+        }
+        return !processed;
+    }
 
-	public boolean processRemainingTasks(int attempts, int delay)
-	{
-		while ((this.taskQueue.size() > 0) && (attempts > 0))
-		{
-			if (this.processTaskQueue())
-			{
-				try
-				{
-					Thread.sleep(delay);
-				}
-				catch (Exception e)
-				{
-				}
-				attempts--;
-			}
-		}
-		return (attempts <= 0);
-	}
+    public boolean processRemainingTasks(int attempts, int delay) {
+        while ((this.taskQueue.size() > 0) && (attempts > 0)) {
+            if (this.processTaskQueue()) {
+                try {
+                    Thread.sleep(delay);
+                } catch (Exception e) {
+                }
+                attempts--;
+            }
+        }
+        return (attempts <= 0);
+    }
 
-	public int tasksRemaining()
-	{
-		return this.taskQueue.size();
-	}
+    public int tasksRemaining() {
+        return this.taskQueue.size();
+    }
 
-	public boolean close()
-	{
-		boolean error = true;
-		try
-		{
-			this.taskLeftPerType();
-			// stop accepting new tasks
-			this.executor.shutdown();
-			// process remaining tasks
-			this.processRemainingTasks(50, 5);
-			// should already be terminated, but just in case...
-			error = !this.executor.awaitTermination(10L, TimeUnit.SECONDS);
-			error = false;
-		}
-		catch (InterruptedException e)
-		{
-			Logging.log("error: IO task was interrupted during shutdown");
-			e.printStackTrace();
-		}
-		this.closed = true;
-		return error;
-	}
+    public boolean close() {
+        boolean error = true;
+        try {
+            this.taskLeftPerType();
+            // stop accepting new tasks
+            this.executor.shutdown();
+            // process remaining tasks
+            this.processRemainingTasks(50, 5);
+            // should already be terminated, but just in case...
+            error = !this.executor.awaitTermination(10L, TimeUnit.SECONDS);
+            error = false;
+        } catch (InterruptedException e) {
+            Logging.log("error: IO task was interrupted during shutdown");
+            e.printStackTrace();
+        }
+        this.closed = true;
+        return error;
+    }
 
-	private void taskLeftPerType()
-	{
-		HashMap<String, Object> tasksLeft = new HashMap<String, Object>();
+    private void taskLeftPerType() {
+        HashMap<String, Object> tasksLeft = new HashMap<String, Object>();
 
-		for (Task t : this.taskQueue)
-		{
-			String className = t.getClass().toString();
-			if (tasksLeft.containsKey(className))
-			{
-				tasksLeft.put(className, ((Integer)tasksLeft.get(className)) + 1);
-			}
-			else
-			{
-				tasksLeft.put(className, 1);
-			}
-		}
+        for (Task t : this.taskQueue) {
+            String className = t.getClass().toString();
+            if (tasksLeft.containsKey(className)) {
+                tasksLeft.put(className, ((Integer) tasksLeft.get(className)) + 1);
+            } else {
+                tasksLeft.put(className, 1);
+            }
+        }
 
-		for (Map.Entry<String, Object> entry : tasksLeft.entrySet()) {
-			String key = entry.getKey();
-			Object value = entry.getValue();
+        for (Map.Entry<String, Object> entry : tasksLeft.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
 
-			Logging.log("waiting for %d %s to finish...", value, key);
-		}
-	}
+            Logging.log("waiting for %d %s to finish...", value, key);
+        }
+    }
 }

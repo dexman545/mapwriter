@@ -1,89 +1,72 @@
 package dex.mapwriter3.util;
 
+import net.minecraftforge.fml.common.Loader;
+import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-import net.minecraftforge.fml.common.Loader;
+public class VersionCheck implements Runnable {
+    private static boolean isLatestVersion = true;
+    private static String latestVersion = "";
+    private static String updateURL = "";
 
-import org.apache.commons.io.IOUtils;
+    /**
+     * @author jabelar
+     * @link http://jabelarminecraft.blogspot.nl/p/minecraft-forge-1721710-
+     * making
+     * -mod.html
+     */
 
-public class VersionCheck implements Runnable
-{
-	private static boolean isLatestVersion = true;
-	private static String latestVersion = "";
-	private static String updateURL = "";
+    @Override
+    public void run() {
+        InputStream in = null;
+        try {
+            in = new URL(MwReference.VersionURL).openStream();
+        } catch (MalformedURLException e) {
+        } catch (IOException e) {
+        }
 
-	/**
-	 * @author jabelar
-	 * @link
-	 *       http://jabelarminecraft.blogspot.nl/p/minecraft-forge-1721710-
-	 *       making
-	 *       -mod.html
-	 */
+        try {
+            List<String> list = IOUtils.readLines(in);
+            int index = -1;
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).contains(Loader.instance().getMCVersionString())) {
+                    index = i;
+                    break;
+                }
+            }
 
-	@Override
-	public void run()
-	{
-		InputStream in = null;
-		try
-		{
-			in = new URL(MwReference.VersionURL).openStream();
-		}
-		catch (MalformedURLException e)
-		{
-		}
-		catch (IOException e)
-		{
-		}
+            String version = list.get(index + 1);
+            version = version.replace("\"modVersion\":\"", "");
+            version = version.replace("\",", "");
+            version = version.replace(" ", "");
+            latestVersion = version;
 
-		try
-		{
-			List<String> list = IOUtils.readLines(in);
-			int index = -1;
-			for (int i = 0; i < list.size(); i++)
-			{
-				if (list.get(i).contains(Loader.instance().getMCVersionString()))
-				{
-					index = i;
-					break;
-				}
-			}
+            String updateURL = list.get(index + 3);
+            updateURL = updateURL.replace("\"updateURL\":\"", "");
+            updateURL = updateURL.replace("\",", "");
+            updateURL = updateURL.replace(" ", "");
+            VersionCheck.updateURL = updateURL;
 
-			String version = list.get(index + 1);
-			version = version.replace("\"modVersion\":\"", "");
-			version = version.replace("\",", "");
-			version = version.replace(" ", "");
-			latestVersion = version;
+            isLatestVersion = MwReference.VERSION.equals(version);
+        } catch (IOException e) {
+        }
 
-			String updateURL = list.get(index + 3);
-			updateURL = updateURL.replace("\"updateURL\":\"", "");
-			updateURL = updateURL.replace("\",", "");
-			updateURL = updateURL.replace(" ", "");
-			VersionCheck.updateURL = updateURL;
+    }
 
-			isLatestVersion = MwReference.VERSION.equals(version);
-		}
-		catch (IOException e)
-		{
-		}
+    public static boolean isLatestVersion() {
+        return isLatestVersion;
+    }
 
-	}
+    public static String getLatestVersion() {
+        return latestVersion;
+    }
 
-	public static boolean isLatestVersion()
-	{
-		return isLatestVersion;
-	}
-
-	public static String getLatestVersion()
-	{
-		return latestVersion;
-	}
-
-	public static String getUpdateURL()
-	{
-		return updateURL;
-	}
+    public static String getUpdateURL() {
+        return updateURL;
+    }
 }

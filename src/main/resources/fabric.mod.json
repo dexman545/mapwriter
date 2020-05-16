@@ -15,10 +15,10 @@
   "icon": "assets/mapwriter/icon.png",
   "environment": "*",
   "entrypoints": {
-    "main": [
-      "dex.mapwriter3.MapwriterFabric"
+    "main": [],
+    "client": [
+        "dex.mapwriter3.MapwriterFabric"
     ],
-    "client": [],
     "server": []
   },
   "mixins": [

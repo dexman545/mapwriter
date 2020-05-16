@@ -3,39 +3,34 @@ package dex.mapwriter3.gui;
 import dex.mapwriter3.Mw;
 import dex.mapwriter3.config.WorldConfig;
 import dex.mapwriter3.map.MapView;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.resource.language.I18n;
 
-@SideOnly(Side.CLIENT)
-public class MwGuiDimensionDialog extends MwGuiTextDialog
-{
+@Environment(EnvType.CLIENT)
+public class MwGuiDimensionDialog extends MwGuiTextDialog {
 
-	final Mw mw;
-	final MapView mapView;
-	final int dimension;
+    final Mw mw;
+    final MapView mapView;
+    final DimensionType dimension;
 
-	public MwGuiDimensionDialog(GuiScreen parentScreen, Mw mw, MapView mapView, int dimension)
-	{
-		super(parentScreen, I18n.format("mw.gui.mwguidimensiondialog.title") + ":", Integer.toString(dimension), I18n.format("mw.gui.mwguidimensiondialog.error"));
-		this.mw = mw;
-		this.mapView = mapView;
-		this.dimension = dimension;
-	}
+    public MwGuiDimensionDialog(Screen parentScreen, Mw mw, MapView mapView, DimensionType dimension) {
+        super(parentScreen, I18n.translate("mw.gui.mwguidimensiondialog.title") + ":", Integer.toString(dimension), I18n.translate("mw.gui.mwguidimensiondialog.error"));
+        this.mw = mw;
+        this.mapView = mapView;
+        this.dimension = dimension;
+    }
 
-	@Override
-	public boolean submit()
-	{
-		boolean done = false;
-		int dimension = this.getInputAsInt();
-		if (this.inputValid)
-		{
-			this.mapView.setDimensionAndAdjustZoom(dimension);
-			this.mw.miniMap.view.setDimension(dimension);
-			WorldConfig.getInstance().addDimension(dimension);
-			done = true;
-		}
-		return done;
-	}
+    @Override
+    public boolean submit() {
+        boolean done = false;
+        DimensionType dimension = this.getInputAsInt();
+        if (this.inputValid) {
+            this.mapView.setDimensionAndAdjustZoom(dimension);
+            this.mw.miniMap.view.setDimension(dimension);
+            WorldConfig.getInstance().addDimension(dimension);
+            done = true;
+        }
+        return done;
+    }
 }
