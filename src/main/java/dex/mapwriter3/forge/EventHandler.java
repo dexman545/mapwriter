@@ -2,10 +2,15 @@ package dex.mapwriter3.forge;
 
 import dex.mapwriter3.Mw;
 import dex.mapwriter3.config.Config;
+import dex.mapwriter3.events.PlayerDeathCallback;
 import dex.mapwriter3.overlay.OverlaySlime;
 import dex.mapwriter3.util.Logging;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.LiteralText;
 import net.minecraftforge.client.event.*;
@@ -14,12 +19,18 @@ import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+@Environment(EnvType.CLIENT)
 public class EventHandler {
 
     Mw mw;
 
     public EventHandler(Mw mw) {
         this.mw = mw;
+
+        PlayerDeathCallback.EVENT.register(player -> {
+            this.mw.onPlayerDeath((PlayerEntity) player);
+            return ActionResult.PASS;
+        });
     }
 
     @SubscribeEvent
@@ -65,14 +76,14 @@ public class EventHandler {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    /*@SubscribeEvent(priority = EventPriority.LOWEST)
     public void eventPlayerDeath(LivingDeathEvent event) {
         if (!event.isCanceled()) {
             if (event.entityLiving.getEntityId() == net.minecraft.client.MinecraftClient.getInstance().player.getEntityId()) {
                 this.mw.onPlayerDeath((EntityPlayerMP) event.entityLiving);
             }
         }
-    }
+    }*/
 
     @SubscribeEvent
     public void renderMap(RenderGameOverlayEvent.Post event) {

@@ -1,9 +1,14 @@
 package dex.mapwriter3.map;
 
 import dex.mapwriter3.region.Region;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.world.dimension.DimensionType;
 
+@Environment(EnvType.CLIENT)
 public class MapViewRequest {
-    public final int xMin, xMax, zMin, zMax, zoomLevel, dimension;
+    public final int xMin, xMax, zMin, zMax, zoomLevel;
+    public final DimensionType dimension;
 
     public MapViewRequest(MapView view) {
         this.zoomLevel = view.getRegionZoomLevel();

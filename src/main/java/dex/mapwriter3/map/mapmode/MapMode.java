@@ -4,9 +4,7 @@ import dex.mapwriter3.config.MapModeConfig;
 import dex.mapwriter3.map.MapView;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.ScaledResolution;
 
 import java.awt.*;
 
@@ -57,8 +55,8 @@ public class MapMode {
 
     public void setScreenRes() {
         MinecraftClient mc = MinecraftClient.getInstance();
-        ScaledResolution sRes = new ScaledResolution(mc);
-        this.setScreenRes(mc.displayWidth, mc.displayHeight, sRes.getScaledWidth(), sRes.getScaledHeight(), sRes.getScaleFactor());
+        //ScaledResolution sRes = new ScaledResolution(mc);
+        this.setScreenRes(mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight(), mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight(), mc.getWindow().getScaleFactor());
     }
 
     public void updateMargin() {

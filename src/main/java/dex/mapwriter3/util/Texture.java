@@ -1,14 +1,15 @@
 package dex.mapwriter3.util;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.texture.Sprite;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.texture.Sprite;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import java.nio.IntBuffer;
 
+@Environment(EnvType.CLIENT)
 public class Texture {
 
     private int id;
@@ -83,7 +84,7 @@ public class Texture {
                 this.pixelBuf.position(bufOffset + (i * this.w));
                 this.pixelBuf.get(pixels, offset + (i * scanSize), w);
             } catch (IllegalArgumentException e) {
-                Logging.logWarning("MwTexture.getRGB: IllegalArgumentException (icon name: %s; height: %d; width: %d; MaxU: %f; MinU: %f; MaxV: %f; MinV: %f)", icon.getIconName(), icon.getIconHeight(), icon.getIconWidth(), icon.getMaxU(), icon.getMinU(), icon.getMaxV(), icon.getMinV());
+                Logging.logWarning("MwTexture.getRGB: IllegalArgumentException (icon name: %s; height: %d; width: %d; MaxU: %f; MinU: %f; MaxV: %f; MinV: %f)", icon.getId(), icon.getHeight(), icon.getWidth(), icon.getMaxU(), icon.getMinU(), icon.getMaxV(), icon.getMinV());
                 Logging.logWarning("MwTexture.getRGB: IllegalArgumentException (pos: %d)", bufOffset + (i * this.w));
                 Logging.logWarning("MwTexture.getRGB: IllegalArgumentException (buffersize: %d)", this.pixelBuf.limit());
             }

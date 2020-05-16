@@ -7,16 +7,14 @@ import dex.mapwriter3.util.Texture;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.renderer.texture.Sprite;
+import net.minecraft.client.color.world.FoliageColors;
+import net.minecraft.client.color.world.GrassColors;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.ColorizerFoliage;
-import net.minecraft.world.ColorizerGrass;
 import net.minecraft.world.biome.BiomeGenBase;
 
 // Static class to generate BlockColours.
@@ -60,10 +58,10 @@ public class BlockColourGen {
             if (BiomeGenBase.getBiomeGenArray()[i] != null) {
                 bc.setBiomeWaterShading(i, BiomeGenBase.getBiomeGenArray()[i].getWaterColorMultiplier() & 0xffffff);
 
-                double temp = MathHelper.clamp_float(BiomeGenBase.getBiomeGenArray()[i].temperature, 0.0F, 1.0F);
-                double rain = MathHelper.clamp_float(BiomeGenBase.getBiomeGenArray()[i].rainfall, 0.0F, 1.0F);
-                int grasscolor = ColorizerGrass.getGrassColor(temp, rain);
-                int foliagecolor = ColorizerFoliage.getFoliageColor(temp, rain);
+                double temp = MathHelper.clamp(BiomeGenBase.getBiomeGenArray()[i].temperature, 0.0F, 1.0F);
+                double rain = MathHelper.clamp(BiomeGenBase.getBiomeGenArray()[i].rainfall, 0.0F, 1.0F);
+                int grasscolor = GrassColors.getColor(temp, rain);
+                int foliagecolor = FoliageColors.getColor(temp, rain);
 
                 bc.setBiomeGrassShading(i, grasscolor & 0xffffff);
                 bc.setBiomeFoliageShading(i, foliagecolor & 0xffffff);

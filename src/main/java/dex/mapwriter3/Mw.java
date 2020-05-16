@@ -23,9 +23,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
 
@@ -430,9 +429,9 @@ public class Mw {
     }
 
     // add chunk to the set of loaded chunks
-    public void onChunkLoad(Chunk chunk) {
+    public void onChunkLoad(WorldChunk chunk) {
         this.load();
-        if ((chunk != null) && (chunk instanceof ClientWorld)) {
+        if ((chunk != null) && (chunk.getWorld() instanceof ClientWorld)) {
             if (this.ready) {
                 this.chunkManager.addChunk(chunk);
             } else {
@@ -451,7 +450,7 @@ public class Mw {
 
     // from onTick when mc.currentScreen is an instance of GuiGameOver
     // it's the only option to detect death client side
-    public void onPlayerDeath(EntityPlayerMP player) {
+    public void onPlayerDeath(PlayerEntity player) {
         if (this.ready && (Config.maxDeathMarkers > 0)) {
             this.updatePlayer();
             int deleteCount = (this.markerManager.countMarkersInGroup("playerDeaths") - Config.maxDeathMarkers) + 1;

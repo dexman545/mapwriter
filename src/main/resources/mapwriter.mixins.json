@@ -3,7 +3,9 @@
   "package": "dex.mapwriter3.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [],
-  "client": [],
+  "client": [
+    "PlayerEntityMixin"
+  ],
   "server": [],
   "injectors": {
     "defaultRequire": 1

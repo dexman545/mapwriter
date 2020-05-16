@@ -15,6 +15,7 @@ import net.minecraft.tileentity.BlockEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
@@ -114,7 +115,7 @@ public class ChunkManager {
             if (entry != null) {
                 // if this chunk is within a certain distance to the player then
                 // add it to the viewed set
-                Chunk chunk = entry.getKey();
+                WorldChunk chunk = entry.getKey();
 
                 int flags = entry.getValue();
                 if (Utils.distToChunkSq(this.mw.playerXInt, this.mw.playerZInt, chunk) <= Config.maxChunkSaveDistSq) {

@@ -58,7 +58,7 @@ public class WorldConfig {
     }
 
     public void cleanDimensionList() {
-        List<Integer> dimensionListCopy = new ArrayList<DimensionType>(this.dimensionList);
+        List<DimensionType> dimensionListCopy = new ArrayList<DimensionType>(this.dimensionList);
         this.dimensionList.clear();
         for (DimensionType dimension : dimensionListCopy) {
             this.addDimension(dimension);

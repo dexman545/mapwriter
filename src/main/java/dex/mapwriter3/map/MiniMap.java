@@ -5,10 +5,13 @@ import dex.mapwriter3.config.Config;
 import dex.mapwriter3.map.mapmode.LargeMapMode;
 import dex.mapwriter3.map.mapmode.MapMode;
 import dex.mapwriter3.map.mapmode.SmallMapMode;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Environment(EnvType.CLIENT)
 public class MiniMap {
     public MapMode smallMapMode;
     public MapMode largeMapMode;

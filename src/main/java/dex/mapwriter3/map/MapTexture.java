@@ -5,11 +5,15 @@ import dex.mapwriter3.region.Region;
 import dex.mapwriter3.region.RegionManager;
 import dex.mapwriter3.tasks.MapUpdateViewTask;
 import dex.mapwriter3.util.Texture;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.world.dimension.DimensionType;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Environment(EnvType.CLIENT)
 public class MapTexture extends Texture {
 
     public int textureRegions;

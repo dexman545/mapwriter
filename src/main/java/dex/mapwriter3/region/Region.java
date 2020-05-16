@@ -50,11 +50,11 @@ public class Region {
 
     @Override
     public String toString() {
-        return String.format("(%d,%d) z%d dim%d", this.x, this.z, this.zoomLevel, this.dimension);
+        return String.format("(%d,%d) z%d dim %s", this.x, this.z, this.zoomLevel, this.dimension.toString());
     }
 
     private static File addDimensionDirToPath(File dir, DimensionType dimension) {
-        if (dimension != 0) {
+        if (dimension != DimensionType.OVERWORLD) {
             dir = new File(dir, "DIM" + dimension);
         }
         return dir;
@@ -93,8 +93,8 @@ public class Region {
         x = (x >> (Region.SHIFT + zoomLevel)) & 0xffff;
         z = (z >> (Region.SHIFT + zoomLevel)) & 0xffff;
         zoomLevel = zoomLevel & 0xff;
-        dimension = dimension & 0xff;
-        return Long.valueOf((((long) dimension) << 40) | (((long) zoomLevel) << 32) | (((long) z) << 16) | (x));
+        int dimensionID = dimension.getRawId() & 0xff; //todo experimenting with just getting the raw id and using that
+        return Long.valueOf((((long) dimensionID) << 40) | (((long) zoomLevel) << 32) | (((long) z) << 16) | (x));
     }
 
     public int getPixelOffset(int x, int z) {

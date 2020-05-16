@@ -8,6 +8,8 @@ import dex.mapwriter3.overlay.OverlaySlime;
 import dex.mapwriter3.region.MwChunk;
 import dex.mapwriter3.util.MwReference;
 import dex.mapwriter3.util.VersionCheck;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
@@ -15,6 +17,7 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 import java.io.File;
 
+@Environment(EnvType.CLIENT)
 public class ClientProxy extends CommonProxy {
 
     @Override

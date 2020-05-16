@@ -10,6 +10,7 @@ import net.minecraft.world.dimension.DimensionType;
 
 import java.util.List;
 
+@Environment(EnvType.CLIENT)
 public class MapView {
 
     private int zoomLevel = 0;
@@ -41,7 +42,6 @@ public class MapView {
     private boolean undergroundMode;
     private boolean fullscreenMap;
 
-    @Environment(EnvType.CLIENT)
     public MapView(Mw mw, boolean FullscreenMap) {
         this.minZoom = Config.zoomInLevels;
         this.maxZoom = Config.zoomOutLevels;

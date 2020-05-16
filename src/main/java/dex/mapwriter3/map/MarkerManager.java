@@ -1,13 +1,21 @@
 package dex.mapwriter3.map;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import dex.mapwriter3.config.Config;
 import dex.mapwriter3.config.WorldConfig;
 import dex.mapwriter3.map.mapmode.MapMode;
 import dex.mapwriter3.util.Logging;
 import dex.mapwriter3.util.MwReference;
 import dex.mapwriter3.util.Utils;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.TextRenderer;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -23,6 +31,7 @@ import java.util.List;
 
 import static org.lwjgl.opengl.ARBDepthClamp.GL_DEPTH_CLAMP;
 
+@Environment(EnvType.CLIENT)
 public class MarkerManager {
 
     public List<Marker> markerList = new ArrayList<Marker>();
@@ -99,7 +108,7 @@ public class MarkerManager {
     }
 
     public String markerToString(Marker marker) {
-        return String.format("%s:%d:%d:%d:%d:%06x:%s", marker.name, marker.x, marker.y, marker.z, marker.dimension, marker.colour & 0xffffff, marker.groupName);
+        return String.format("%s:%d:%d:%d-%s-%06x:%s", marker.name, marker.x, marker.y, marker.z, marker.dimension.toString(), marker.colour & 0xffffff, marker.groupName);
     }
 
     public Marker stringToMarker(String s) {
@@ -300,9 +309,9 @@ public class MarkerManager {
 
     public void drawBeam(Marker m, float partialTicks) {
         Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        BufferBuilder worldrenderer = tessellator.getBuffer();
 
-        float f2 = MinecraftClient.getInstance().theWorld.getTotalWorldTime() + partialTicks;
+        float f2 = MinecraftClient.getInstance().world.getTime() + partialTicks;
         double d3 = f2 * 0.025D * -1.5D;
         // the height of the beam always to the max height
         double d17 = 255.0D;
@@ -312,14 +321,14 @@ public class MarkerManager {
         double z = m.z - BlockEntityRendererDispatcher.staticPlayerZ;
 
         GlStateManager.pushMatrix();
-        GlStateManager.disableTexture2D();
+        GlStateManager.disableTexture();
         GlStateManager.disableLighting();
         GlStateManager.disableCull();
         GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.blendFuncSeparate(770, 771, 1, 0);
         GlStateManager.depthMask(false);
 
-        worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        worldrenderer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
         // size of the square from middle to edge
         double d4 = 0.2D;
 
@@ -337,25 +346,25 @@ public class MarkerManager {
         float fBlue = m.getBlue();
         float fAlpha = 0.125f;
 
-        worldrenderer.pos(x + d5, y + d17, z + d6).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d5, y, z + d6).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d7, y, z + d8).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d7, y + d17, z + d8).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d11, y + d17, z + d12).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d11, y, z + d12).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d9, y, z + d10).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d9, y + d17, z + d10).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d7, y + d17, z + d8).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d7, y, z + d8).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d11, y, z + d12).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d11, y + d17, z + d12).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d9, y + d17, z + d10).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d9, y, z + d10).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d5, y, z + d6).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d5, y + d17, z + d6).color(fRed, fGreen, fBlue, fAlpha).endVertex();
+        worldrenderer.vertex(x + d5, y + d17, z + d6).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d5, y, z + d6).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d7, y, z + d8).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d7, y + d17, z + d8).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d11, y + d17, z + d12).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d11, y, z + d12).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d9, y, z + d10).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d9, y + d17, z + d10).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d7, y + d17, z + d8).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d7, y, z + d8).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d11, y, z + d12).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d11, y + d17, z + d12).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d9, y + d17, z + d10).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d9, y, z + d10).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d5, y, z + d6).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d5, y + d17, z + d6).color(fRed, fGreen, fBlue, fAlpha).next();
         tessellator.draw();
 
-        worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        worldrenderer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
         // size of the square from middle to edge
         d4 = 0.5D;
 
@@ -368,26 +377,26 @@ public class MarkerManager {
         d11 = 0.5D + (Math.sin(d3 + 5.497787143782138D) * d4);
         d12 = 0.5D + (Math.cos(d3 + 5.497787143782138D) * d4);
 
-        worldrenderer.pos(x + d5, y + d17, z + d6).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d5, y, z + d6).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d7, y, z + d8).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d7, y + d17, z + d8).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d11, y + d17, z + d12).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d11, y, z + d12).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d9, y, z + d10).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d9, y + d17, z + d10).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d7, y + d17, z + d8).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d7, y, z + d8).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d11, y, z + d12).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d11, y + d17, z + d12).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d9, y + d17, z + d10).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d9, y, z + d10).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d5, y, z + d6).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(x + d5, y + d17, z + d6).color(fRed, fGreen, fBlue, fAlpha).endVertex();
+        worldrenderer.vertex(x + d5, y + d17, z + d6).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d5, y, z + d6).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d7, y, z + d8).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d7, y + d17, z + d8).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d11, y + d17, z + d12).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d11, y, z + d12).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d9, y, z + d10).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d9, y + d17, z + d10).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d7, y + d17, z + d8).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d7, y, z + d8).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d11, y, z + d12).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d11, y + d17, z + d12).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d9, y + d17, z + d10).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d9, y, z + d10).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d5, y, z + d6).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(x + d5, y + d17, z + d6).color(fRed, fGreen, fBlue, fAlpha).next();
         tessellator.draw();
 
         GlStateManager.enableLighting();
-        GlStateManager.enableTexture2D();
+        GlStateManager.enableTexture();
         GlStateManager.depthMask(true);
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
@@ -421,48 +430,48 @@ public class MarkerManager {
         float f1 = 0.016666668F * f;
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x, y, z);
+        GlStateManager.translated(x, y, z);
         GL11.glNormal3f(0.0F, 1.0F, 0.0F);
         GlStateManager.rotatef(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotatef(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-        GlStateManager.scale(-f1, -f1, f1);
+        GlStateManager.scalef(-f1, -f1, f1);
         GlStateManager.disableLighting();
         GlStateManager.depthMask(false);
-        GlStateManager.disableDepth();
+        GlStateManager.disableDepthTest();
         GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.blendFuncSeparate(770, 771, 1, 0);
         GL11.glEnable(GL_DEPTH_CLAMP);
 
         Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        BufferBuilder worldrenderer = tessellator.getBuffer();
 
-        GlStateManager.disableTexture2D();
+        GlStateManager.disableTexture();
 
-        worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-        worldrenderer.pos(-strTextWidth - 1, (-1), 0.0D).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(-strTextWidth - 1, (8), 0.0D).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(strTextWidth + 1, (8), 0.0D).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(strTextWidth + 1, (-1), 0.0D).color(fRed, fGreen, fBlue, fAlpha).endVertex();
+        worldrenderer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+        worldrenderer.vertex(-strTextWidth - 1, (-1), 0.0D).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(-strTextWidth - 1, (8), 0.0D).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(strTextWidth + 1, (8), 0.0D).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(strTextWidth + 1, (-1), 0.0D).color(fRed, fGreen, fBlue, fAlpha).next();
         tessellator.draw();
 
-        worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-        worldrenderer.pos(-strDistanceWidth - 1, -1 + offstet, 0.0D).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(-strDistanceWidth - 1, 8 + offstet, 0.0D).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(strDistanceWidth + 1, 8 + offstet, 0.0D).color(fRed, fGreen, fBlue, fAlpha).endVertex();
-        worldrenderer.pos(strDistanceWidth + 1, -1 + offstet, 0.0D).color(fRed, fGreen, fBlue, fAlpha).endVertex();
+        worldrenderer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+        worldrenderer.vertex(-strDistanceWidth - 1, -1 + offstet, 0.0D).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(-strDistanceWidth - 1, 8 + offstet, 0.0D).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(strDistanceWidth + 1, 8 + offstet, 0.0D).color(fRed, fGreen, fBlue, fAlpha).next();
+        worldrenderer.vertex(strDistanceWidth + 1, -1 + offstet, 0.0D).color(fRed, fGreen, fBlue, fAlpha).next();
         tessellator.draw();
 
-        GlStateManager.enableTexture2D();
+        GlStateManager.enableTexture();
         GlStateManager.depthMask(true);
 
-        fontrenderer.drawString(strText, -strTextWidth, 0, -1);
-        fontrenderer.drawString(strDistance, -strDistanceWidth, offstet, -1);
+        fontrenderer.draw(strText, -strTextWidth, 0, -1);
+        fontrenderer.draw(strDistance, -strDistanceWidth, offstet, -1);
 
         GL11.glDisable(GL_DEPTH_CLAMP);
         GlStateManager.enableDepthTest();
         GlStateManager.enableLighting();
         GlStateManager.disableBlend();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.blendColor(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
     }
 }

@@ -3,7 +3,10 @@ package dex.mapwriter3.tasks;
 import dex.mapwriter3.map.MapTexture;
 import dex.mapwriter3.map.MapViewRequest;
 import dex.mapwriter3.region.RegionManager;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
+@Environment(EnvType.CLIENT)
 public class MapUpdateViewTask extends Task {
     final MapViewRequest req;
     RegionManager regionManager;

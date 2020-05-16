@@ -3,12 +3,15 @@ package dex.mapwriter3.map;
 import dex.mapwriter3.map.mapmode.MapMode;
 import dex.mapwriter3.util.Render;
 import dex.mapwriter3.util.Utils;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.dimension.DimensionType;
 
 import java.awt.*;
 
+@Environment(EnvType.CLIENT)
 public class Marker {
     public final String name;
     public final String groupName;

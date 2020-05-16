@@ -154,12 +154,12 @@ public class UndergroundTexture extends Texture {
 
         int cxMax = this.updateX + 2;
         int czMax = this.updateZ + 2;
-        WorldClient world = this.mw.mc.world;
+        ClientWorld world = this.mw.mc.world;
         int flagOffset = 0;
         for (int cz = this.updateZ; cz <= czMax; cz++) {
             for (int cx = this.updateX; cx <= cxMax; cx++) {
                 if (this.isChunkInTexture(cx, cz)) {
-                    Chunk chunk = world.getChunkFromChunkCoords(cx, cz);
+                    Chunk chunk = world.getChunk(cx, cz);
                     int tx = (cx << 4) & (this.textureSize - 1);
                     int tz = (cz << 4) & (this.textureSize - 1);
                     int pixelOffset = (tz * this.textureSize) + tx;

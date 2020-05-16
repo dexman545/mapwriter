@@ -368,8 +368,8 @@ public class MwGui extends Screen {
         } else if ((MwAPI.getCurrentDataProvider() != null) && MwAPI.getCurrentDataProvider().onMouseInput(this.mapView, this.mapMode)) {
             return;
         } else {
-            int x = (Mouse.getEventX() * this.width) / this.mw.mc.getWindow().getWidth();
-            int y = this.height - ((Mouse.getEventY() * this.height) / this.mw.mc.getWindow().getHeight()) - 1;
+            int x = (Mouse.getEventX() * this.width) / this.mw.mc.getWindow().getFramebufferWidth();
+            int y = this.height - ((Mouse.getEventY() * this.height) / this.mw.mc.getWindow().getFramebufferHeight()) - 1;
             int direction = Mouse.getEventDWheel();
             if (direction != 0) {
                 this.mouseDWheelScrolled(x, y, direction);

@@ -1,6 +1,8 @@
 package dex.mapwriter3;
 
+import dex.mapwriter3.events.PlayerDeathCallback;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.event.client.ClientTickCallback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,5 +15,8 @@ public class MapwriterFabric implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         logger.info("Loaded!");
+
+        //ClientTickCallback.EVENT.register();
+
     }
 }

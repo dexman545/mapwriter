@@ -1,6 +1,7 @@
 package dex.mapwriter3.region;
 
 import dex.mapwriter3.util.Logging;
+import net.minecraft.world.dimension.DimensionType;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
