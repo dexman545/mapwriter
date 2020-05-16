@@ -4,22 +4,28 @@ import dex.mapwriter3.Mw;
 import dex.mapwriter3.region.ChunkRender;
 import dex.mapwriter3.region.IChunk;
 import dex.mapwriter3.util.Texture;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.dimension.DimensionType;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.Arrays;
 
+@Environment(EnvType.CLIENT)
 public class UndergroundTexture extends Texture {
 
     private Mw mw;
     private int px = 0;
     private int py = 0;
     private int pz = 0;
-    private DimensionType dimension = 0;
+    private DimensionType dimension = DimensionType.OVERWORLD;
     private int updateX;
     private int updateZ;
     private byte[][] updateFlags = new byte[9][256];
@@ -190,7 +196,7 @@ public class UndergroundTexture extends Texture {
 
                 if (columnFlag == ChunkRender.FLAG_UNPROCESSED) {
                     // if column not yet processed
-                    WorldClient world = this.mw.mc.world;
+                    ClientWorld world = this.mw.mc.world;
                     Block block = world.getBlockState(new BlockPos(x, y, z)).getBlock();
                     if ((block == null) || !block.isOpaqueCube()) {
                         // if block is not opaque

@@ -264,7 +264,7 @@ public class MwGui extends Screen {
     // c is the ascii equivalent of the key typed.
     // key is the lwjgl key code.
     @Override
-    public boolean charTyped(char c, int key) {
+    public boolean charTyped(char c, int key) { //TODO change to proper keybdining inputs
         // MwUtil.log("MwGui.keyTyped(%c, %d)", c, key);
         switch (key) {
             case GLFW.GLFW_KEY_ESCAPE:
@@ -340,16 +340,16 @@ public class MwGui extends Screen {
                 break;
 
             default:
-                if (key == MwKeyHandler.keyMapGui.getKeyCode()) {
+                if (MwKeyHandler.keyMapGui.isPressed()) {
                     this.exitGui();
-                } else if (key == MwKeyHandler.keyZoomIn.getKeyCode()) {
+                } else if (MwKeyHandler.keyZoomIn.isPressed()) {
                     this.mapView.adjustZoomLevel(-1);
-                } else if (key == MwKeyHandler.keyZoomOut.getKeyCode()) {
+                } else if (MwKeyHandler.keyZoomOut.isPressed()) {
                     this.mapView.adjustZoomLevel(1);
-                } else if (key == MwKeyHandler.keyNextGroup.getKeyCode()) {
+                } else if (MwKeyHandler.keyNextGroup.isPressed()) {
                     this.mw.markerManager.nextGroup();
                     this.mw.markerManager.update();
-                } else if (key == MwKeyHandler.keyUndergroundMode.getKeyCode()) {
+                } else if (MwKeyHandler.keyUndergroundMode.isPressed()) {
                     this.mw.toggleUndergroundMode();
                     this.mapView.setUndergroundMode(Config.undergroundMode);
                 }
@@ -368,8 +368,8 @@ public class MwGui extends Screen {
         } else if ((MwAPI.getCurrentDataProvider() != null) && MwAPI.getCurrentDataProvider().onMouseInput(this.mapView, this.mapMode)) {
             return;
         } else {
-            int x = (Mouse.getEventX() * this.width) / this.mc.displayWidth;
-            int y = this.height - ((Mouse.getEventY() * this.height) / this.mc.displayHeight) - 1;
+            int x = (Mouse.getEventX() * this.width) / this.mw.mc.getWindow().getWidth();
+            int y = this.height - ((Mouse.getEventY() * this.height) / this.mw.mc.getWindow().getHeight()) - 1;
             int direction = Mouse.getEventDWheel();
             if (direction != 0) {
                 this.mouseDWheelScrolled(x, y, direction);
@@ -389,18 +389,18 @@ public class MwGui extends Screen {
         } else {
             if (button == 0) {
                 if (this.dimensionLabel.posWithin(x, y)) {
-                    this.mc.openScreen(new MwGuiDimensionDialog(this, this.mw, this.mapView, this.mapView.getDimension()));
+                    this.mw.mc.openScreen(new MwGuiDimensionDialog(this, this.mw, this.mapView, this.mapView.getDimension()));
                 } else if (this.optionsLabel.posWithin(x, y)) {
                     try {
                         Screen newScreen = ModGuiConfig.class.getConstructor(Screen.class).newInstance(this);
-                        this.mc.openScreen(newScreen);
+                        this.mw.mc.openScreen(newScreen);
                     } catch (Exception e) {
                         Logging.logError("There was a critical issue trying to build the config GUI for %s", MwReference.MOD_ID);
                     }
                 } else if (this.updateLabel.posWithin(x, y)) {
                     URI uri;
 
-                    if (!this.mc.gameSettings.chatLinks) {
+                    if (!this.mw.mc.options.chatLinks) {
                         return;
                     }
 
@@ -411,9 +411,9 @@ public class MwGui extends Screen {
                             throw new URISyntaxException(uri.toString(), "Unsupported protocol: " + uri.getScheme().toLowerCase());
                         }
 
-                        if (this.mc.gameSettings.chatLinksPrompt) {
+                        if (this.mw.mc.options.chatLinksPrompt) {
                             this.clickedLinkURI = uri;
-                            this.mc.openScreen(new GuiConfirmOpenLink(this, uri.toString(), 31102009, false));
+                            this.mw.mc.openScreen(new GuiConfirmOpenLink(this, uri.toString(), 31102009, false));
                         } else {
                             Utils.openWebLink(uri);
                         }
@@ -508,7 +508,7 @@ public class MwGui extends Screen {
 
     // closes this gui
     public void exitGui() {
-        this.mc.openScreen((Screen) null);
+        this.mw.mc.openScreen((Screen) null);
     }
 
     /**
@@ -535,10 +535,10 @@ public class MwGui extends Screen {
             builder.append(I18n.translate("mw.gui.mwgui.status.cursorNoY", bX, bZ));
         }
 
-        if (this.mc.world != null) {
-            if (!this.mc.world.getChunkFromBlockCoords(new BlockPos(bX, 0, bZ)).isEmpty()) {
+        if (this.mw.mc.world != null) {
+            if (!this.mw.mc.world.getWorldChunk(new BlockPos(bX, 0, bZ)).isEmpty()) {
                 builder.append(", ");
-                builder.append(I18n.translate("mw.gui.mwgui.status.biome", this.mc.world.getBiomeGenForCoords(new BlockPos(bX, 0, bZ)).biomeName));
+                builder.append(I18n.translate("mw.gui.mwgui.status.biome", this.mw.mc.world.getBiomeGenForCoords(new BlockPos(bX, 0, bZ)).biomeName));
             }
         }
 
@@ -547,7 +547,7 @@ public class MwGui extends Screen {
             builder.append(provider.getStatusString(this.mapView.getDimension(), bX, bY, bZ));
         }
         String s = builder.toString();
-        int x = (this.width / 2) - 10 - (this.fontRendererObj.getStringWidth(s) / 2);
+        int x = (this.width / 2) - 10 - (this.textRenderer.getStringWidth(s) / 2);
 
         this.statusLabel.setCoords(x, this.height - 21);
         this.statusLabel.setText(new String[]
@@ -587,7 +587,7 @@ public class MwGui extends Screen {
         this.map.draw();
 
         // let the renderEngine know we have changed the texture.
-        // this.mc.renderEngine.resetBoundTexture();
+        // this.mw.mc.renderEngine.resetBoundTexture();
 
         // get the block the mouse is currently hovering over
         Point p = this.mapMode.screenXYtoBlockXZ(this.mapView, mouseX, mouseY);
@@ -627,7 +627,7 @@ public class MwGui extends Screen {
         if (this.isPlayerNearScreenPos(mouseX, mouseY)) {
             this.markerLabel.setText(new String[]
                     {
-                            this.mc.player.getDisplayNameString(),
+                            this.mw.mc.player.getEntityName(),
                             String.format("(%d, %d, %d)", this.mw.playerXInt, this.mw.playerYInt, this.mw.playerZInt)
                     }, null);
             this.markerLabel.setCoords(mouseX + 8, mouseY);
@@ -681,7 +681,7 @@ public class MwGui extends Screen {
             }
 
             this.clickedLinkURI = null;
-            this.mc.openScreen(this);
+            this.mw.mc.openScreen(this);
         }
     }
 
@@ -696,9 +696,9 @@ public class MwGui extends Screen {
             // right clicked previously selected marker.
             // edit the marker
             if (Config.newMarkerDialog) {
-                this.mc.openScreen(new MwGuiMarkerDialogNew(this, this.mw.markerManager, m));
+                this.mw.mc.openScreen(new MwGuiMarkerDialogNew(this, this.mw.markerManager, m));
             } else {
-                this.mc.openScreen(new MwGuiMarkerDialog(this, this.mw.markerManager, m));
+                this.mw.mc.openScreen(new MwGuiMarkerDialog(this, this.mw.markerManager, m));
             }
 
         } else if (m == null) {
@@ -722,9 +722,9 @@ public class MwGui extends Screen {
                 mz = this.mouseBlockZ;
             }
             if (Config.newMarkerDialog) {
-                this.mc.openScreen(new MwGuiMarkerDialogNew(this, this.mw.markerManager, "", group, mx, my, mz, this.mapView.getDimension()));
+                this.mw.mc.openScreen(new MwGuiMarkerDialogNew(this, this.mw.markerManager, "", group, mx, my, mz, this.mapView.getDimension()));
             } else {
-                this.mc.openScreen(new MwGuiMarkerDialog(this, this.mw.markerManager, "", group, mx, my, mz, this.mapView.getDimension()));
+                this.mw.mc.openScreen(new MwGuiMarkerDialog(this, this.mw.markerManager, "", group, mx, my, mz, this.mapView.getDimension()));
             }
         }
     }

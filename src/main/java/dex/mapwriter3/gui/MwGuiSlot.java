@@ -1,9 +1,14 @@
 package dex.mapwriter3.gui;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -14,7 +19,7 @@ import org.lwjgl.opengl.GL11;
 
 @Environment(EnvType.CLIENT)
 public abstract class MwGuiSlot {
-    protected final Minecraft mc;
+    protected final MinecraftClient mc;
     public int width;
     public int height;
     /**
@@ -69,7 +74,7 @@ public abstract class MwGuiSlot {
     private boolean enabled = false;
     int spacingY = 4;
 
-    public MwGuiSlot(Minecraft mcIn, int width, int height, int topIn, int bottomIn, int left) {
+    public MwGuiSlot(MinecraftClient mcIn, int width, int height, int topIn, int bottomIn, int left) {
         this.mc = mcIn;
         this.width = width;
         this.height = height;
@@ -195,7 +200,7 @@ public abstract class MwGuiSlot {
             i = 0;
         }
 
-        this.amountScrolled = MathHelper.clamp_float(this.amountScrolled, 0.0F, i);
+        this.amountScrolled = MathHelper.clamp(this.amountScrolled, 0.0F, i);
     }
 
     public int func_148135_f() {
@@ -379,10 +384,10 @@ public abstract class MwGuiSlot {
                         int l = this.getSlotIndexFromScreenCoords(this.mouseX, this.mouseY);
 
                         if ((this.mouseX >= i) && (this.mouseX <= j) && (l >= 0) && (k >= 0) && (l < this.getSize())) {
-                            boolean flag1 = (l == this.selectedElement) && ((Minecraft.getSystemTime() - this.lastClicked) < 250L);
+                            boolean flag1 = (l == this.selectedElement) && ((MinecraftClient.getSystemTime() - this.lastClicked) < 250L);
                             this.elementClicked(l, flag1, this.mouseX, this.mouseY, 1);
                             this.selectedElement = l;
-                            this.lastClicked = Minecraft.getSystemTime();
+                            this.lastClicked = MinecraftClient.getSystemTime();
                         } else if ((this.mouseX >= i) && (this.mouseX <= j) && (k < 0)) {
                             this.func_148132_a(this.mouseX - i, (this.mouseY - this.top) + (int) this.amountScrolled);
                         }

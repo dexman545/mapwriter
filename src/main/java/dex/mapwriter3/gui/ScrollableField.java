@@ -3,7 +3,9 @@ package dex.mapwriter3.gui;
 import dex.mapwriter3.util.MwReference;
 import dex.mapwriter3.util.Render;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.TextRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.texture.TextureManager;
 
@@ -25,9 +27,9 @@ public abstract class ScrollableField extends Gui {
     public static int arrowsWidth = 7;
     private int arrowsHeight = 12;
 
-    public final FontRenderer fontrendererObj;
+    public final TextRenderer fontrendererObj;
 
-    public ScrollableField(int x, int y, int width, String label, FontRenderer fontrendererObj) {
+    public ScrollableField(int x, int y, int width, String label, TextRenderer fontrendererObj) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -40,13 +42,13 @@ public abstract class ScrollableField extends Gui {
         this.arrowsY = this.y;
 
         this.labelWidth = fontrendererObj.getStringWidth(this.label);
-        this.labelHeight = this.fontrendererObj.FONT_HEIGHT;
+        this.labelHeight = this.fontrendererObj.fontHeight;
         this.labelX = this.x - this.labelWidth;
         this.labelY = (this.y + (this.labelHeight / 2)) - 2;
     }
 
     public void draw() {
-        TextureManager renderEngine = Minecraft.getMinecraft().renderEngine;
+        TextureManager renderEngine = MinecraftClient.getInstance().renderEngine;
         // Render.drawRectBorder(labelX, y, width + this.labelWidth + 4,
         // this.arrowsHeight, 2);
 

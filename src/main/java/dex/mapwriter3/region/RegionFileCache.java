@@ -1,5 +1,7 @@
 package dex.mapwriter3.region;
 
+import net.minecraft.world.dimension.DimensionType;
+
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -46,8 +48,8 @@ public class RegionFileCache {
 
     public File getRegionFilePath(int x, int z, DimensionType dimension) {
         File dir = this.worldDir;
-        if (dimension != 0) {
-            dir = new File(dir, "DIM" + dimension);
+        if (dimension != DimensionType.OVERWORLD) {
+            dir = dimension.getSaveDirectory(dir);
         }
         dir = new File(dir, "region");
 

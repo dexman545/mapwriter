@@ -1,11 +1,15 @@
 package dex.mapwriter3.gui;
 
-import net.minecraft.client.gui.GuiTextField;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.screen.Screen;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 
+@Environment(EnvType.CLIENT)
 public class MwGuiTextDialog extends Screen {
 
     private final Screen parentScreen;
@@ -13,7 +17,7 @@ public class MwGuiTextDialog extends Screen {
     String title;
     String text;
     String error;
-    GuiTextField textField = null;
+    TextFieldWidget textField = null;
     boolean inputValid = false;
     boolean showError = false;
     boolean backToGameOnSubmit = false;
@@ -34,7 +38,7 @@ public class MwGuiTextDialog extends Screen {
             this.text = this.textField.getText();
         }
         int w = (this.width * textDialogWidthPercent) / 100;
-        this.textField = new GuiTextField(0, this.fontRendererObj, ((this.width - w) / 2) + 5, textDialogY, w - 10, 12);
+        this.textField = new TextFieldWidget(0, this.textRenderer, ((this.width - w) / 2) + 5, textDialogY, w - 10, 12);
         this.textField.setMaxStringLength(32);
         this.textField.setFocused(true);
         this.textField.setCanLoseFocus(false);
@@ -102,10 +106,10 @@ public class MwGuiTextDialog extends Screen {
 
         int w = (this.width * textDialogWidthPercent) / 100;
         drawRect((this.width - w) / 2, textDialogTitleY - 4, ((this.width - w) / 2) + w, textDialogErrorY + 14, 0x80000000);
-        this.drawCenteredString(this.fontRendererObj, this.title, this.width / 2, textDialogTitleY, 0xffffff);
+        this.drawCenteredString(this.textRenderer, this.title, this.width / 2, textDialogTitleY, 0xffffff);
         this.textField.drawTextBox();
         if (this.showError) {
-            this.drawCenteredString(this.fontRendererObj, this.error, this.width / 2, textDialogErrorY, 0xffffff);
+            this.drawCenteredString(this.textRenderer, this.error, this.width / 2, textDialogErrorY, 0xffffff);
         }
 
         super.drawScreen(mouseX, mouseY, f);
@@ -119,11 +123,11 @@ public class MwGuiTextDialog extends Screen {
     @Override
     protected void keyTyped(char c, int key) {
         switch (key) {
-            case Keyboard.KEY_ESCAPE:
+            case GLFW.GLFW_KEY_ESCAPE:
                 this.mc.openScreen(this.parentScreen);
                 break;
 
-            case Keyboard.KEY_RETURN:
+            case  GLFW.GLFW_KEY_ENTER:
                 // when enter pressed, submit current input
                 if (this.submit()) {
                     if (!this.backToGameOnSubmit) {

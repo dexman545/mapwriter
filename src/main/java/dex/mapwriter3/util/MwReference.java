@@ -1,7 +1,7 @@
 package dex.mapwriter3.util;
 
 import com.google.common.collect.Sets;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 
 import java.util.HashSet;
 import java.util.regex.Pattern;
@@ -33,13 +33,13 @@ public final class MwReference {
     public static final String blockColourSaveFileName = "MapWriterBlockColours.txt";
     public static final String blockColourOverridesFileName = "MapWriterBlockColourOverrides.txt";
 
-    public static final ResourceLocation backgroundTexture = new ResourceLocation("mapwriter", "textures/map/background.png");
-    public static final ResourceLocation roundMapTexture = new ResourceLocation("mapwriter", "textures/map/border_round.png");
-    public static final ResourceLocation squareMapTexture = new ResourceLocation("mapwriter", "textures/map/border_square.png");
-    public static final ResourceLocation playerArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_player.png");
-    public static final ResourceLocation northArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_north.png");
-    public static final ResourceLocation leftArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_text_left.png");
-    public static final ResourceLocation rightArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_text_right.png");
+    public static final Identifier backgroundTexture = new Identifier("mapwriter", "textures/map/background.png");
+    public static final Identifier roundMapTexture = new Identifier("mapwriter", "textures/map/border_round.png");
+    public static final Identifier squareMapTexture = new Identifier("mapwriter", "textures/map/border_square.png");
+    public static final Identifier playerArrowTexture = new Identifier("mapwriter", "textures/map/arrow_player.png");
+    public static final Identifier northArrowTexture = new Identifier("mapwriter", "textures/map/arrow_north.png");
+    public static final Identifier leftArrowTexture = new Identifier("mapwriter", "textures/map/arrow_text_left.png");
+    public static final Identifier rightArrowTexture = new Identifier("mapwriter", "textures/map/arrow_text_right.png");
 
     public static final HashSet<String> PROTOCOLS = Sets.newHashSet(new String[]
             {

@@ -55,7 +55,7 @@ public class MwForge {
             // null.
             // a bit hacky, but simpler than checking if the connection has
             // closed.
-            if ((Mw.getInstance().ready) && (Minecraft.getMinecraft().thePlayer == null)) {
+            if ((Mw.getInstance().ready) && (MinecraftClient.getInstance().player == null)) {
                 Mw.getInstance().close();
             }
         }

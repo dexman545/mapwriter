@@ -1,7 +1,8 @@
 package dex.mapwriter3.gui;
 
 import dex.mapwriter3.util.Utils;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.TextRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.resource.language.I18n;
 
@@ -23,7 +24,7 @@ public class ScrollableColorSelector extends ScrollableField {
 
     private int y;
 
-    public ScrollableColorSelector(int x, int y, int width, String label, FontRenderer fontrendererObj) {
+    public ScrollableColorSelector(int x, int y, int width, String label, TextRenderer fontrendererObj) {
         super(x, y + MwGuiMarkerDialogNew.elementVSpacing, width, label, fontrendererObj);
         this.y = y;
         this.init();

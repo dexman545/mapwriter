@@ -68,7 +68,7 @@ public class EventHandler {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void eventPlayerDeath(LivingDeathEvent event) {
         if (!event.isCanceled()) {
-            if (event.entityLiving.getEntityId() == net.minecraft.client.Minecraft.getMinecraft().thePlayer.getEntityId()) {
+            if (event.entityLiving.getEntityId() == net.minecraft.client.MinecraftClient.getInstance().player.getEntityId()) {
                 this.mw.onPlayerDeath((EntityPlayerMP) event.entityLiving);
             }
         }

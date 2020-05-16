@@ -16,7 +16,7 @@ public class WorldConfig {
     public Configuration worldConfiguration = null;
 
     // list of available dimensions
-    public List<Integer> dimensionList = new ArrayList<Integer>();
+    public List<DimensionType> dimensionList = new ArrayList<DimensionType>();
 
     private WorldConfig() {
         // load world specific config file

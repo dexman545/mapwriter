@@ -4,13 +4,18 @@ import dex.mapwriter3.Mw;
 import dex.mapwriter3.region.BlockColours;
 import dex.mapwriter3.region.RegionManager;
 import dex.mapwriter3.util.Utils;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.world.dimension.DimensionType;
 
+@Environment(EnvType.CLIENT)
 public class RebuildRegionsTask extends Task {
 
     final RegionManager regionManager;
     final BlockColours blockColours;
-    final int x, z, w, h, dimension;
+    final int x, z, w, h;
+    final DimensionType dimension;
     String msg = "";
 
     public RebuildRegionsTask(Mw mw, int x, int z, int w, int h, DimensionType dimension) {

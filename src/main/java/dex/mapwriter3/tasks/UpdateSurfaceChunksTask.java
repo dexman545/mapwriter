@@ -4,12 +4,15 @@ import dex.mapwriter3.Mw;
 import dex.mapwriter3.map.MapTexture;
 import dex.mapwriter3.region.MwChunk;
 import dex.mapwriter3.region.RegionManager;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.world.ChunkCoordIntPair;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Environment(EnvType.CLIENT)
 public class UpdateSurfaceChunksTask extends Task {
     private MwChunk chunk;
     private RegionManager regionManager;

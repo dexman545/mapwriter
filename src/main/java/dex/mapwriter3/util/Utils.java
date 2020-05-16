@@ -1,13 +1,16 @@
 package dex.mapwriter3.util;
 
 import dex.mapwriter3.config.Config;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.FontRenderer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.util.LiteralText;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.text.LiteralText;
+import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.dimension.DimensionType;
 
 import java.io.File;
 import java.net.URI;
@@ -18,6 +21,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@Environment(EnvType.CLIENT)
 public class Utils {
     public static int[] integerListToIntArray(List<Integer> list) {
         // convert List of integers to integer array
@@ -63,17 +67,17 @@ public class Utils {
 
     // send an ingame chat message and console log
     public static void printBoth(String msg) {
-        EntityPlayerSP thePlayer = Minecraft.getMinecraft().thePlayer;
+        ClientPlayerEntity thePlayer = MinecraftClient.getInstance().player;
         if (thePlayer != null) {
-            thePlayer.addChatMessage(new LiteralText(msg));
+            thePlayer.addChatMessage(new LiteralText(msg), false);
         }
         Logging.log("%s", msg);
     }
 
     public static File getDimensionDir(File worldDir, DimensionType dimension) {
         File dimDir;
-        if (dimension != 0) {
-            dimDir = new File(worldDir, "DIM" + dimension);
+        if (dimension != DimensionType.OVERWORLD) {
+            dimDir = dimension.getSaveDirectory(worldDir);
         } else {
             dimDir = worldDir;
         }
@@ -110,24 +114,24 @@ public class Utils {
         return dateFormat.format(new Date());
     }
 
-    public static int distToChunkSq(int x, int z, Chunk chunk) {
-        int dx = ((chunk.xPosition << 4) + 8) - x;
-        int dz = ((chunk.zPosition << 4) + 8) - z;
+    public static int distToChunkSq(int x, int z, WorldChunk chunk) {
+        int dx = ((chunk.getPos().x << 4) + 8) - x;
+        int dz = ((chunk.getPos().z << 4) + 8) - z;
         return (dx * dx) + (dz * dz);
     }
 
     public static String getWorldName() {
         String worldName;
 
-        if (Minecraft.getMinecraft().isIntegratedServerRunning()) {
+        if (MinecraftClient.getInstance().isIntegratedServerRunning()) {
             // cannot use this.mc.world.getWorldInfo().getWorldName() as it
             // is set statically to "MpServer".
-            IntegratedServer server = Minecraft.getMinecraft().getIntegratedServer();
-            worldName = (server != null) ? server.getFolderName() : "sp_world";
-        } else if (Minecraft.getMinecraft().isConnectedToRealms()) {
+            IntegratedServer server = MinecraftClient.getInstance().getServer();
+            worldName = (server != null) ? server.getServerName() : "sp_world";
+        } else if (MinecraftClient.getInstance().isConnectedToRealms()) {
             worldName = "Realms";
         } else {
-            worldName = Minecraft.getMinecraft().getCurrentServerData().serverIP;
+            worldName = MinecraftClient.getInstance().getCurrentServerEntry().address;
             if (!Config.portNumberInWorldNameEnabled) {
                 worldName = worldName.substring(0, worldName.indexOf(":"));
             } else {
@@ -177,7 +181,7 @@ public class Utils {
     }
 
     public static int getMaxWidth(String[] arr, String[] arr2) {
-        FontRenderer fontRendererObj = Minecraft.getMinecraft().fontRendererObj;
+        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
         int Width = 1;
         for (int i = 0; i < arr.length; i++) {
             int w1 = 0;
@@ -185,11 +189,11 @@ public class Utils {
 
             if (i < arr.length) {
                 String s = I18n.translate(arr[i]);
-                w1 = fontRendererObj.getStringWidth(s);
+                w1 = textRenderer.getStringWidth(s);
             }
             if ((arr2 != null) && (i < arr2.length)) {
                 String s = I18n.translate(arr2[i]);
-                w2 = fontRendererObj.getStringWidth(s);
+                w2 = textRenderer.getStringWidth(s);
                 w2 += 65;
             }
             int wTot = w1 > w2 ? w1 : w2;

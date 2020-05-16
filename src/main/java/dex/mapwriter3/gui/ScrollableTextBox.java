@@ -1,7 +1,9 @@
 package dex.mapwriter3.gui;
 
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.TextRenderer;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.input.Keyboard;
 
 import java.util.List;
@@ -14,14 +16,14 @@ public class ScrollableTextBox extends ScrollableField {
 
     public List<String> scrollableElements;
 
-    protected GuiTextField textField;
+    protected TextFieldWidget textField;
 
-    ScrollableTextBox(int x, int y, int width, String label, FontRenderer fontrendererObj) {
+    ScrollableTextBox(int x, int y, int width, String label, TextRenderer fontrendererObj) {
         super(x, y, width, label, fontrendererObj);
         this.init();
     }
 
-    ScrollableTextBox(int x, int y, int width, String label, List<String> scrollableElements, FontRenderer fontrendererObj) {
+    ScrollableTextBox(int x, int y, int width, String label, List<String> scrollableElements, TextRenderer fontrendererObj) {
         super(x, y, width, label, fontrendererObj);
         this.scrollableElements = scrollableElements;
         this.init();
@@ -32,7 +34,7 @@ public class ScrollableTextBox extends ScrollableField {
         this.textFieldY = this.y;
         this.textFieldWidth = this.width - 5 - (ScrollableField.arrowsWidth * 2);
 
-        this.textField = new GuiTextField(0, this.fontrendererObj, this.textFieldX, this.textFieldY, this.textFieldWidth, ScrollableTextBox.textFieldHeight);
+        this.textField = new TextFieldWidget(0, this.fontrendererObj, this.textFieldX, this.textFieldY, this.textFieldWidth, ScrollableTextBox.textFieldHeight);
 
         this.textField.setMaxStringLength(32);
 
@@ -146,7 +148,7 @@ class ScrollableNumericTextBox extends ScrollableTextBox {
     public int maxValue = -1;
     public int minValue = -1;
 
-    public ScrollableNumericTextBox(int x, int y, int width, String label, FontRenderer fontrendererObj) {
+    public ScrollableNumericTextBox(int x, int y, int width, String label, TextRenderer fontrendererObj) {
         super(x, y, width, label, fontrendererObj);
     }
 
@@ -184,7 +186,7 @@ class ScrollableNumericTextBox extends ScrollableTextBox {
 
     @Override
     public void KeyTyped(char c, int key) {
-        if (((c >= '0') && (c <= '9')) || (key == Keyboard.KEY_BACK) || (key == Keyboard.KEY_LEFT) || (key == Keyboard.KEY_RIGHT) || ((c == '-') && (this.getCursorPosition() == 0))) {
+        if (((c >= '0') && (c <= '9')) || (key == GLFW.GLFW_KEY_BACKSPACE) || (key == GLFW.GLFW_KEY_LEFT) || (key == GLFW.GLFW_KEY_RIGHT) || ((c == '-') && (this.getCursorPosition() == 0))) {
             if (Character.isDigit(c) && ((this.maxValue > -1) && (Integer.parseInt(this.getText() + c) > this.maxValue))) {
                 return;
             }

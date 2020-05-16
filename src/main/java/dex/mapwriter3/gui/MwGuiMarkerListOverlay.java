@@ -4,6 +4,7 @@ import dex.mapwriter3.map.Marker;
 import dex.mapwriter3.map.MarkerManager;
 import dex.mapwriter3.util.Utils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 
 public class MwGuiMarkerListOverlay extends MwGuiSlot {
@@ -15,7 +16,7 @@ public class MwGuiMarkerListOverlay extends MwGuiSlot {
     private int height;
 
     public MwGuiMarkerListOverlay(Screen parentScreen, MarkerManager markerManager) {
-        super(Minecraft.getMinecraft(), // mcIn
+        super(MinecraftClient.getInstance(), // mcIn
                 listWidth, // width
                 parentScreen.height - 20, // height
                 ListY, // topIn
@@ -32,7 +33,7 @@ public class MwGuiMarkerListOverlay extends MwGuiSlot {
     @Override
     protected int getSlotHeight(int index) {
         String str = Utils.stringArrayToString(this.getLabelString(index));
-        int height = this.mc.fontRendererObj.splitStringWidth(str, MwGuiMarkerListOverlay.listWidth - 6);
+        int height = this.mc.textRenderer.splitStringWidth(str, MwGuiMarkerListOverlay.listWidth - 6);
 
         height += this.spacingY * 2;
 

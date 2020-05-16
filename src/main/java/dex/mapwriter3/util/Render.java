@@ -1,7 +1,13 @@
 package dex.mapwriter3.util;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.TextRenderer;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -16,6 +22,7 @@ import org.lwjgl.opengl.GL12;
  * Tesselator class)
  */
 
+@Environment(EnvType.CLIENT)
 public class Render {
     public static double zDepth = 0.0D;
     public static final double circleSteps = 30.0;
@@ -275,24 +282,24 @@ public class Render {
     }
 
     public static void drawString(int x, int y, int colour, String formatString, Object... args) {
-        Minecraft mc = Minecraft.getMinecraft();
+        MinecraftClient mc = MinecraftClient.getInstance();
         // mc.renderEngine.resetBoundTexture();
-        FontRenderer fr = mc.fontRendererObj;
+        TextRenderer fr = mc.textRenderer;
         String s = String.format(formatString, args);
         fr.drawStringWithShadow(s, x, y, colour);
     }
 
     public static void drawCentredString(int x, int y, int colour, String formatString, Object... args) {
-        Minecraft mc = Minecraft.getMinecraft();
+        MinecraftClient mc = MinecraftClient.getInstance();
         // mc.renderEngine.resetBoundTexture();
-        FontRenderer fr = mc.fontRendererObj;
+        TextRenderer fr = mc.textRenderer;
         String s = String.format(formatString, args);
         int w = fr.getStringWidth(s);
         fr.drawStringWithShadow(s, x - (w / 2), y, colour);
     }
 
     public static void setCircularStencil(double x, double y, double r) {
-        GlStateManager.enableDepth();
+        GlStateManager.enableDepthTest();
         // disable drawing to the color buffer.
         // circle will only be drawn to depth buffer.
         GlStateManager.colorMask(false, false, false, false);

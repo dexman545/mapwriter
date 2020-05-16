@@ -3,6 +3,7 @@ package dex.mapwriter3.gui;
 import dex.mapwriter3.Mw;
 import dex.mapwriter3.config.Config;
 import dex.mapwriter3.map.MapView;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resource.language.I18n;

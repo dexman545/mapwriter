@@ -7,12 +7,12 @@ import dex.mapwriter3.util.Logging;
 import dex.mapwriter3.util.MwReference;
 import dex.mapwriter3.util.Utils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.TextRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.client.renderer.tileentity.BlockEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.config.Configuration;
@@ -287,7 +287,7 @@ public class MarkerManager {
         }
 
         for (Marker m : this.visibleMarkerList) {
-            if (m.dimension == Minecraft.getMinecraft().thePlayer.dimension) {
+            if (m.dimension == MinecraftClient.getInstance().player.dimension) {
                 if (Config.drawMarkersInWorld) {
                     this.drawBeam(m, partialTicks);
                 }
@@ -302,14 +302,14 @@ public class MarkerManager {
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
 
-        float f2 = Minecraft.getMinecraft().theWorld.getTotalWorldTime() + partialTicks;
+        float f2 = MinecraftClient.getInstance().theWorld.getTotalWorldTime() + partialTicks;
         double d3 = f2 * 0.025D * -1.5D;
         // the height of the beam always to the max height
         double d17 = 255.0D;
 
-        double x = m.x - TileEntityRendererDispatcher.staticPlayerX;
-        double y = 0.0D - TileEntityRendererDispatcher.staticPlayerY;
-        double z = m.z - TileEntityRendererDispatcher.staticPlayerZ;
+        double x = m.x - BlockEntityRendererDispatcher.staticPlayerX;
+        double y = 0.0D - BlockEntityRendererDispatcher.staticPlayerY;
+        double z = m.z - BlockEntityRendererDispatcher.staticPlayerZ;
 
         GlStateManager.pushMatrix();
         GlStateManager.disableTexture2D();
@@ -395,13 +395,13 @@ public class MarkerManager {
 
     public void drawLabel(Marker m) {
         float growFactor = 0.17F;
-        Minecraft mc = Minecraft.getMinecraft();
+        MinecraftClient mc = MinecraftClient.getInstance();
         RenderManager renderManager = mc.getRenderManager();
-        FontRenderer fontrenderer = mc.fontRendererObj;
+        TextRenderer fontrenderer = mc.textRenderer;
 
-        double x = (0.5D + m.x) - TileEntityRendererDispatcher.staticPlayerX;
-        double y = (0.5D + m.y) - TileEntityRendererDispatcher.staticPlayerY;
-        double z = (0.5D + m.z) - TileEntityRendererDispatcher.staticPlayerZ;
+        double x = (0.5D + m.x) - BlockEntityRendererDispatcher.staticPlayerX;
+        double y = (0.5D + m.y) - BlockEntityRendererDispatcher.staticPlayerY;
+        double z = (0.5D + m.z) - BlockEntityRendererDispatcher.staticPlayerZ;
 
         float fRed = m.getRed();
         float fGreen = m.getGreen();
@@ -423,8 +423,8 @@ public class MarkerManager {
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
         GL11.glNormal3f(0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotatef(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotatef(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
         GlStateManager.scale(-f1, -f1, f1);
         GlStateManager.disableLighting();
         GlStateManager.depthMask(false);
@@ -459,7 +459,7 @@ public class MarkerManager {
         fontrenderer.drawString(strDistance, -strDistanceWidth, offstet, -1);
 
         GL11.glDisable(GL_DEPTH_CLAMP);
-        GlStateManager.enableDepth();
+        GlStateManager.enableDepthTest();
         GlStateManager.enableLighting();
         GlStateManager.disableBlend();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

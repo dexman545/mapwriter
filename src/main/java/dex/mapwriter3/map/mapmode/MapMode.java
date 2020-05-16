@@ -2,11 +2,15 @@ package dex.mapwriter3.map.mapmode;
 
 import dex.mapwriter3.config.MapModeConfig;
 import dex.mapwriter3.map.MapView;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.ScaledResolution;
 
 import java.awt.*;
 
+@Environment(EnvType.CLIENT)
 public class MapMode {
     private int sw = 320;
     private int sh = 240;
@@ -52,7 +56,7 @@ public class MapMode {
     }
 
     public void setScreenRes() {
-        Minecraft mc = Minecraft.getMinecraft();
+        MinecraftClient mc = MinecraftClient.getInstance();
         ScaledResolution sRes = new ScaledResolution(mc);
         this.setScreenRes(mc.displayWidth, mc.displayHeight, sRes.getScaledWidth(), sRes.getScaledHeight(), sRes.getScaleFactor());
     }

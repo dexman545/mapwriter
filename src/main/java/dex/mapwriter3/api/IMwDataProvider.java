@@ -7,13 +7,13 @@ import net.minecraft.world.dimension.DimensionType;
 import java.util.ArrayList;
 
 public interface IMwDataProvider {
-    public ArrayList<IMwChunkOverlay> getChunksOverlay(int dim, double centerX, double centerZ, double minX, double minZ, double maxX, double maxZ);
+    public ArrayList<IMwChunkOverlay> getChunksOverlay(DimensionType dim, double centerX, double centerZ, double minX, double minZ, double maxX, double maxZ);
 
     // Returns what should be added to the status bar by the addon.
-    public String getStatusString(int dim, int bX, int bY, int bZ);
+    public String getStatusString(DimensionType dim, int bX, int bY, int bZ);
 
     // Call back for middle click.
-    public void onMiddleClick(int dim, int bX, int bZ, MapView mapview);
+    public void onMiddleClick(DimensionType dim, int bX, int bZ, MapView mapview);
 
     // Callback for dimension change on the map
     public void onDimensionChanged(DimensionType dimension, MapView mapview);

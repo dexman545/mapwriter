@@ -9,6 +9,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.world.dimension.DimensionType;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -127,32 +128,32 @@ public class MwGuiMarkerDialogNew extends Screen {
 
     @Override
     public void initGui() {
-        int labelsWidth = this.fontRendererObj.getStringWidth("Group");
+        int labelsWidth = this.textRenderer.getStringWidth("Group");
         int width = ((this.width * dialogWidthPercent) / 100) - labelsWidth - 20;
         int x = ((this.width - width) + labelsWidth) / 2;
         int y = (this.height - (elementVSpacing * numberOfElements)) / 2;
 
-        this.scrollableTextBoxName = new ScrollableTextBox(x, y, width, I18n.translate(this.editMarkerName), this.fontRendererObj);
+        this.scrollableTextBoxName = new ScrollableTextBox(x, y, width, I18n.translate(this.editMarkerName), this.textRenderer);
         this.scrollableTextBoxName.setFocused(true);
         this.scrollableTextBoxName.setText(this.markerName);
 
-        this.scrollableTextBoxGroup = new ScrollableTextBox(x, y + MwGuiMarkerDialogNew.elementVSpacing, width, I18n.translate(this.editMarkerGroup), this.markerManager.groupList, this.fontRendererObj);
+        this.scrollableTextBoxGroup = new ScrollableTextBox(x, y + MwGuiMarkerDialogNew.elementVSpacing, width, I18n.translate(this.editMarkerGroup), this.markerManager.groupList, this.textRenderer);
         this.scrollableTextBoxGroup.setText(this.markerGroup);
         this.scrollableTextBoxGroup.setDrawArrows(true);
 
-        this.scrollableNumericTextBoxX = new ScrollableNumericTextBox(x, y + (MwGuiMarkerDialogNew.elementVSpacing * 2), width, I18n.translate(this.editMarkerX), this.fontRendererObj);
+        this.scrollableNumericTextBoxX = new ScrollableNumericTextBox(x, y + (MwGuiMarkerDialogNew.elementVSpacing * 2), width, I18n.translate(this.editMarkerX), this.textRenderer);
         this.scrollableNumericTextBoxX.setText("" + this.markerX);
         this.scrollableNumericTextBoxX.setDrawArrows(true);
 
-        this.scrollableNumericTextBoxY = new ScrollableNumericTextBox(x, y + (MwGuiMarkerDialogNew.elementVSpacing * 3), width, I18n.translate(this.editMarkerY), this.fontRendererObj);
+        this.scrollableNumericTextBoxY = new ScrollableNumericTextBox(x, y + (MwGuiMarkerDialogNew.elementVSpacing * 3), width, I18n.translate(this.editMarkerY), this.textRenderer);
         this.scrollableNumericTextBoxY.setText("" + this.markerY);
         this.scrollableNumericTextBoxY.setDrawArrows(true);
 
-        this.scrollableNumericTextBoxZ = new ScrollableNumericTextBox(x, y + (MwGuiMarkerDialogNew.elementVSpacing * 4), width, I18n.translate(this.editMarkerZ), this.fontRendererObj);
+        this.scrollableNumericTextBoxZ = new ScrollableNumericTextBox(x, y + (MwGuiMarkerDialogNew.elementVSpacing * 4), width, I18n.translate(this.editMarkerZ), this.textRenderer);
         this.scrollableNumericTextBoxZ.setText("" + this.markerZ);
         this.scrollableNumericTextBoxZ.setDrawArrows(true);
 
-        this.ScrollableColorSelectorColor = new ScrollableColorSelector(x, y + (MwGuiMarkerDialogNew.elementVSpacing * 5), width, I18n.translate(this.editMarkerColor), this.fontRendererObj);
+        this.ScrollableColorSelectorColor = new ScrollableColorSelector(x, y + (MwGuiMarkerDialogNew.elementVSpacing * 5), width, I18n.translate(this.editMarkerColor), this.textRenderer);
         this.ScrollableColorSelectorColor.setColor(this.colour);
         this.ScrollableColorSelectorColor.setDrawArrows(true);
     }
@@ -168,7 +169,7 @@ public class MwGuiMarkerDialogNew extends Screen {
         int w = (this.width * MwGuiMarkerDialogNew.dialogWidthPercent) / 100;
         drawRect((this.width - w) / 2, ((this.height - (MwGuiMarkerDialogNew.elementVSpacing * (numberOfElements + 2))) / 2) - 4, ((this.width - w) / 2) + w, ((this.height - (MwGuiMarkerDialogNew.elementVSpacing * (numberOfElements + 2))) / 2)
                 + (MwGuiMarkerDialogNew.elementVSpacing * (numberOfElements + 1)), 0x80000000);
-        this.drawCenteredString(this.fontRendererObj, I18n.translate(this.title), (this.width) / 2, ((this.height - (MwGuiMarkerDialogNew.elementVSpacing * (numberOfElements + 1))) / 2) - (MwGuiMarkerDialogNew.elementVSpacing / 4), 0xffffff);
+        this.drawCenteredString(this.textRenderer, I18n.translate(this.title), (this.width) / 2, ((this.height - (MwGuiMarkerDialogNew.elementVSpacing * (numberOfElements + 1))) / 2) - (MwGuiMarkerDialogNew.elementVSpacing / 4), 0xffffff);
         this.scrollableTextBoxName.draw();
         this.scrollableTextBoxGroup.draw();
         this.scrollableNumericTextBoxX.draw();
@@ -218,10 +219,10 @@ public class MwGuiMarkerDialogNew extends Screen {
     @Override
     protected void keyTyped(char c, int key) {
         switch (key) {
-            case Keyboard.KEY_ESCAPE:
+            case  GLFW.GLFW_KEY_ESCAPE:
                 this.mc.openScreen(this.parentScreen);
                 break;
-            case Keyboard.KEY_RETURN:
+            case  GLFW.GLFW_KEY_ENTER:
                 // when enter pressed, submit current input
                 if (this.submit()) {
                     if (!this.backToGameOnSubmit) {
@@ -231,7 +232,7 @@ public class MwGuiMarkerDialogNew extends Screen {
                     }
                 }
                 break;
-            case Keyboard.KEY_TAB:
+            case  GLFW.GLFW_KEY_TAB:
                 ScrollableField thisField = null;
                 ScrollableField prevField = null;
                 ScrollableField nextField = null;

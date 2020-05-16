@@ -1,5 +1,6 @@
 package dex.mapwriter3.map;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import dex.mapwriter3.Mw;
 import dex.mapwriter3.api.IMwChunkOverlay;
 import dex.mapwriter3.api.IMwDataProvider;
@@ -9,11 +10,14 @@ import dex.mapwriter3.config.MapModeConfig;
 import dex.mapwriter3.map.mapmode.MapMode;
 import dex.mapwriter3.util.MwReference;
 import dex.mapwriter3.util.Render;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.GlStateManager;
 
 import java.awt.*;
 import java.util.ArrayList;
 
+@Environment(EnvType.CLIENT)
 public class MapRenderer {
     private Mw mw;
     private MapMode mapMode;
@@ -65,7 +69,7 @@ public class MapRenderer {
         GlStateManager.pushMatrix();
 
         if (this.mapMode.config.rotate && (this.mapMode.config.circular == true)) {
-            GlStateManager.rotate(this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
+            GlStateManager.rotatef(this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
         }
         if (this.mapMode.config.circular) {
             Render.setCircularStencil(0, 0, this.mapMode.h / 2.0);
@@ -150,9 +154,9 @@ public class MapRenderer {
         this.playerArrowScreenPos.setLocation(p.x + this.mapMode.xTranslation, p.y + this.mapMode.yTranslation);
 
         // the arrow only needs to be rotated if the map is NOT rotated
-        GlStateManager.translate(p.x, p.y, 0.0);
+        GlStateManager.translated(p.x, p.y, 0.0);
         if (!this.mapMode.config.rotate || (this.mapMode.config.circular == false)) {
-            GlStateManager.rotate(-this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
+            GlStateManager.rotatef(-this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
         }
 
         double arrowSize = this.mapMode.config.playerArrowSize;
@@ -166,7 +170,7 @@ public class MapRenderer {
         GlStateManager.pushMatrix();
 
         if (this.mapMode.config.rotate && (this.mapMode.config.circular == true)) {
-            GlStateManager.rotate(this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
+            GlStateManager.rotatef(this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
         }
 
         // draw markers
@@ -205,9 +209,9 @@ public class MapRenderer {
         // draw coordinates
         if (!this.mapMode.config.coordsMode.equals(MapModeConfig.coordsModeStringArray[0])) {
             GlStateManager.pushMatrix();
-            GlStateManager.translate(this.textX, this.textY, 0);
+            GlStateManager.translated(this.textX, this.textY, 0);
             if (this.mapMode.config.coordsMode.equals(MapModeConfig.coordsModeStringArray[1])) {
-                GlStateManager.scale(0.5f, 0.5f, 1.0f);
+                GlStateManager.scalef(0.5f, 0.5f, 1.0f);
                 this.textOffset = (int) (this.textOffset * 0.5f);
             }
             Render.drawCentredString(0, 0, this.mapMode.textColour, "%d, %d, %d", this.mw.playerXInt, this.mw.playerYInt, this.mw.playerZInt);
@@ -219,9 +223,9 @@ public class MapRenderer {
     private void drawBiomeName() {
         if (!this.mapMode.config.biomeMode.equals(MapModeConfig.coordsModeStringArray[0])) {
             GlStateManager.pushMatrix();
-            GlStateManager.translate(this.textX, this.textY, 0);
+            GlStateManager.translated(this.textX, this.textY, 0);
             if (this.mapMode.config.biomeMode.equals(MapModeConfig.coordsModeStringArray[1])) {
-                GlStateManager.scale(0.5f, 0.5f, 1.0f);
+                GlStateManager.scalef(0.5f, 0.5f, 1.0f);
                 this.textOffset = (int) (this.textOffset * 0.5f);
             }
             Render.drawCentredString(0, 0, this.mapMode.textColour, this.mw.playerBiome);
@@ -233,8 +237,8 @@ public class MapRenderer {
     private void drawUndergroundMode() {
         if (Config.undergroundMode) {
             GlStateManager.pushMatrix();
-            GlStateManager.translate(this.textX, this.textY, 0);
-            GlStateManager.scale(0.5f, 0.5f, 1.0f);
+            GlStateManager.translated(this.textX, this.textY, 0);
+            GlStateManager.scalef(0.5f, 0.5f, 1.0f);
             this.textOffset = (int) (this.textOffset * 0.5f);
             Render.drawCentredString(0, 0, this.mapMode.textColour, "underground mode");
             this.textY += this.textOffset;
@@ -269,7 +273,7 @@ public class MapRenderer {
         // translate to center of minimap
         // z is -2000 so that it is drawn above the 3D world, but below GUI
         // elements which are typically at -3000
-        GlStateManager.translate(this.mapMode.xTranslation, this.mapMode.yTranslation, -2000.0);
+        GlStateManager.translated(this.mapMode.xTranslation, this.mapMode.yTranslation, -2000.0);
 
         // draw background, the map texture, and enabled overlays
         this.drawMap();
@@ -282,7 +286,7 @@ public class MapRenderer {
         this.drawStatusText();
 
         // some shader mods seem to need depth testing re-enabled
-        GlStateManager.enableDepth();
+        GlStateManager.enableDepthTest();
         GlStateManager.popMatrix();
     }
 

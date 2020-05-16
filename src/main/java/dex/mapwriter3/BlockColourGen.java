@@ -4,12 +4,17 @@ import dex.mapwriter3.region.BlockColours;
 import dex.mapwriter3.util.Logging;
 import dex.mapwriter3.util.Render;
 import dex.mapwriter3.util.Texture;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.renderer.texture.Sprite;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.texture.Sprite;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.ColorizerGrass;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -23,9 +28,10 @@ import net.minecraft.world.biome.BiomeGenBase;
 // BlockColours
 // must not have any interaction after it is generated.
 
+@Environment(EnvType.CLIENT)
 public class BlockColourGen {
 
-    private static int getIconMapColour(TextureAtlasSprite icon, Texture terrainTexture) {
+    private static int getIconMapColour(Sprite icon, Texture terrainTexture) {
         // flipped icons have the U and V coords reversed (minU > maxU, minV >
         // maxV).
         // thanks go to taelnia for fixing this.
@@ -76,11 +82,11 @@ public class BlockColourGen {
         // copy terrain texture to MwRender pixel bytebuffer
 
         // bind the terrain texture
-        // Minecraft.getMinecraft().func_110434_K().func_110577_a(TextureMap.field_110575_b);
+        // MinecraftClient.getInstance().func_110434_K().func_110577_a(TextureMap.field_110575_b);
         // get the bound texture id
         // int terrainTextureId = Render.getBoundTextureId();
 
-        int terrainTextureId = Minecraft.getMinecraft().renderEngine.getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
+        int terrainTextureId = MinecraftClient.getInstance().renderEngine.getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
 
         // create texture object from the currently bound GL texture
         if (terrainTextureId == 0) {
@@ -98,7 +104,7 @@ public class BlockColourGen {
         int b_count = 0;
         int s_count = 0;
 
-        for (Object oblock : Block.blockRegistry) {
+        for (Object oblock : Registry.BLOCK) {
             Block block = (Block) oblock;
             int blockID = Block.getIdFromBlock(block);
 
@@ -109,9 +115,9 @@ public class BlockColourGen {
 
                 if (block != null && block.getRenderType() != -1) {
 
-                    TextureAtlasSprite icon = null;
+                    Sprite icon = null;
                     try {
-                        icon = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(block.getStateFromMeta(dv));
+                        icon = MinecraftClient.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getTexture(block.getStateFromMeta(dv));
                     } catch (Exception e) {
                         // MwUtil.log("genFromTextures: exception caught when requesting block texture for %03x:%x",
                         // blockID, dv);
@@ -134,7 +140,7 @@ public class BlockColourGen {
                             // this method to get the real texture
                             // this makes the carpenterblocks render as brown
                             // blocks on the map
-                            if (((ResourceLocation) Block.blockRegistry.getNameForObject(block)).getResourceDomain().contains("CarpentersBlocks")) {
+                            if (((Identifier) Block.blockRegistry.getNameForObject(block)).getResourceDomain().contains("CarpentersBlocks")) {
                                 // icon = block.getIcon(1, 16);
                                 // blockColour = getIconMapColour(icon,
                                 // terrainTexture);

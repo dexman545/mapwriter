@@ -4,14 +4,18 @@ import dex.mapwriter3.api.IMwChunkOverlay;
 import dex.mapwriter3.api.IMwDataProvider;
 import dex.mapwriter3.map.MapView;
 import dex.mapwriter3.map.mapmode.MapMode;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.dimension.DimensionType;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 
+@Environment(EnvType.CLIENT)
 public class OverlaySlime implements IMwDataProvider {
 
     public static boolean seedFound = false;
@@ -24,7 +28,7 @@ public class OverlaySlime implements IMwDataProvider {
     }
 
     public static void askSeed() {
-        EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player == null) {
             return;
         }
@@ -79,22 +83,22 @@ public class OverlaySlime implements IMwDataProvider {
     }
 
     @Override
-    public ArrayList<IMwChunkOverlay> getChunksOverlay(int dim, double centerX, double centerZ, double minX, double minZ, double maxX, double maxZ) {
+    public ArrayList<IMwChunkOverlay> getChunksOverlay(DimensionType dim, double centerX, double centerZ, double minX, double minZ, double maxX, double maxZ) {
 
         // We should pass the center of the map too to reduce the display like
         // in this case
         // and the zoom lvl, to provide higher level informations
 
-        if (Minecraft.getMinecraft().thePlayer.getEntityWorld().provider.getDimensionId() != dim) {
+        if (MinecraftClient.getInstance().player.getEntityWorld().dimension.getType() != dim) {
             return new ArrayList<IMwChunkOverlay>();
         }
 
-        int minChunkX = (MathHelper.ceiling_double_int(minX) >> 4) - 1;
-        int minChunkZ = (MathHelper.ceiling_double_int(minZ) >> 4) - 1;
-        int maxChunkX = (MathHelper.ceiling_double_int(maxX) >> 4) + 1;
-        int maxChunkZ = (MathHelper.ceiling_double_int(maxZ) >> 4) + 1;
-        int cX = (MathHelper.ceiling_double_int(centerX) >> 4) + 1;
-        int cZ = (MathHelper.ceiling_double_int(centerZ) >> 4) + 1;
+        int minChunkX = (MathHelper.ceil(minX) >> 4) - 1;
+        int minChunkZ = (MathHelper.ceil(minZ) >> 4) - 1;
+        int maxChunkX = (MathHelper.ceil(maxX) >> 4) + 1;
+        int maxChunkZ = (MathHelper.ceil(maxZ) >> 4) + 1;
+        int cX = (MathHelper.ceil(centerX) >> 4) + 1;
+        int cZ = (MathHelper.ceil(centerZ) >> 4) + 1;
 
         int limitMinX = Math.max(minChunkX, cX - 100);
         int limitMaxX = Math.min(maxChunkX, cX + 100);
@@ -123,12 +127,13 @@ public class OverlaySlime implements IMwDataProvider {
     }
 
     @Override
-    public String getStatusString(int dim, int bX, int bY, int bZ) {
-        return "";
+    public String getStatusString(DimensionType dim, int bX, int bY, int bZ) {
+        return null;
     }
 
     @Override
-    public void onMiddleClick(int dim, int bX, int bZ, MapView mapview) {
+    public void onMiddleClick(DimensionType dim, int bX, int bZ, MapView mapview) {
+
     }
 
     @Override

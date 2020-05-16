@@ -2,15 +2,19 @@ package dex.mapwriter3.region;
 
 import dex.mapwriter3.util.Logging;
 import net.minecraft.block.Block;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.BlockEntity;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.chunk.NibbleArray;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.common.FMLLog;
 import org.apache.logging.log4j.Level;
 
@@ -33,20 +37,20 @@ public class MwChunk implements IChunk {
     char[][] dataArray = new char[16][];
 
     public final byte[][] lightingArray;
-    public final Map<BlockPos, TileEntity> tileentityMap;
+    public final Map<BlockPos, BlockEntity> tileentityMap;
 
     public final byte[] biomeArray;
 
     public final int maxY;
 
-    public MwChunk(int x, int z, DimensionType dimension, char[][] data, byte[][] lightingArray, byte[] biomeArray, Map<BlockPos, TileEntity> TileEntityMap) {
+    public MwChunk(int x, int z, DimensionType dimension, char[][] data, byte[][] lightingArray, byte[] biomeArray, Map<BlockPos, BlockEntity> BlockEntityMap) {
 
         this.x = x;
         this.z = z;
         this.dimension = dimension;
         this.biomeArray = biomeArray;
         this.lightingArray = lightingArray;
-        this.tileentityMap = TileEntityMap;
+        this.tileentityMap = BlockEntityMap;
         this.dataArray = data;
         int maxY = 0;
         for (int y = 0; y < 16; y++) {
@@ -59,7 +63,7 @@ public class MwChunk implements IChunk {
 
     @Override
     public String toString() {
-        return String.format("(%d, %d) dim%d", this.x, this.z, this.dimension);
+        return String.format("(%d, %d) dim: %s", this.x, this.z, this.dimension.toString());
     }
 
     // load from anvil file
@@ -69,7 +73,7 @@ public class MwChunk implements IChunk {
         byte[][] lsbArray = new byte[16][];
         char[][] data = new char[16][];
         byte[][] lightingArray = new byte[16][];
-        Map<BlockPos, TileEntity> TileEntityMap = new HashMap<BlockPos, TileEntity>();
+        Map<BlockPos, BlockEntity> BlockEntityMap = new HashMap<BlockPos, BlockEntity>();
 
         DataInputStream dis = null;
         RegionFile regionFile = regionFileCache.getRegionFile(x << 4, z << 4, dimension);
@@ -146,9 +150,9 @@ public class MwChunk implements IChunk {
                 if (nbttaglist2 != null) {
                     for (int i1 = 0; i1 < nbttaglist2.tagCount(); ++i1) {
                         NBTTagCompound nbttagcompound4 = nbttaglist2.getCompoundTagAt(i1);
-                        TileEntity tileentity = TileEntity.createAndLoadEntity(nbttagcompound4);
+                        BlockEntity tileentity = BlockEntity.createAndLoadEntity(nbttagcompound4);
                         if (tileentity != null) {
-                            TileEntityMap.put(tileentity.getPos(), tileentity);
+                            BlockEntityMap.put(tileentity.getPos(), tileentity);
                         }
                     }
                 }
@@ -169,7 +173,7 @@ public class MwChunk implements IChunk {
             // this.x, this.z);
         }
 
-        return new MwChunk(x, z, dimension, data, lightingArray, biomeArray, TileEntityMap);
+        return new MwChunk(x, z, dimension, data, lightingArray, biomeArray, BlockEntityMap);
     }
 
     public boolean isEmpty() {
@@ -263,11 +267,11 @@ public class MwChunk implements IChunk {
         // rendered in the tileentity map)
 
         if (this.tileentityMap.containsKey(pos)) {
-            TileEntity value = this.tileentityMap.get(pos);
+            BlockEntity value = this.tileentityMap.get(pos);
             int id = 0;
 
-            // Get the Block from the carpenter TileEntity
-            if (CarpenterMethod != null) {
+            // Get the Block from the carpenter BlockEntity
+            /*if (CarpenterMethod != null) {
                 try {
                     ItemStack itemStack = (ItemStack) CarpenterMethod.invoke(value, (byte) 6);
                     if (itemStack != null) {
@@ -292,7 +296,7 @@ public class MwChunk implements IChunk {
                 } catch (IllegalAccessException e) {
                 } catch (InvocationTargetException e) {
                 }
-            }
+            }*/
             if (id != 0) {
                 lsb = (id & 255);
                 if (id > 255) {
@@ -362,16 +366,16 @@ public class MwChunk implements IChunk {
 
         NBTTagList nbttaglist3 = new NBTTagList();
 
-        Iterator<TileEntity> iterator1 = this.tileentityMap.values().iterator();
+        Iterator<BlockEntity> iterator1 = this.tileentityMap.values().iterator();
 
         while (iterator1.hasNext()) {
-            TileEntity tileentity = iterator1.next();
+            BlockEntity tileentity = iterator1.next();
             nbttagcompound2 = new NBTTagCompound();
             try {
                 //tileentity.writeToNBT(nbttagcompound2);
                 nbttaglist3.appendTag(nbttagcompound2);
             } catch (Exception e) {
-                FMLLog.log(Level.ERROR, e, "A TileEntity type %s has throw an exception trying to write state. It will not persist. Report this to the mod author", tileentity.getClass().getName());
+                FMLLog.log(Level.ERROR, e, "A BlockEntity type %s has throw an exception trying to write state. It will not persist. Report this to the mod author", tileentity.getClass().getName());
             }
         }
         nbttagcompound1.setTag("TileEntities", nbttaglist3);

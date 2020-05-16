@@ -1,7 +1,9 @@
 package dex.mapwriter3.util;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.Sprite;
+import net.minecraft.client.texture.Sprite;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -74,7 +76,7 @@ public class Texture {
 
     // Copy a rectangular sub-region of dimensions 'w' x 'h' from the pixel
     // buffer to the array 'pixels'.
-    public synchronized void getRGB(int x, int y, int w, int h, int[] pixels, int offset, int scanSize, TextureAtlasSprite icon) {
+    public synchronized void getRGB(int x, int y, int w, int h, int[] pixels, int offset, int scanSize, Sprite icon) {
         int bufOffset = (y * this.w) + x;
         for (int i = 0; i < h; i++) {
             try {

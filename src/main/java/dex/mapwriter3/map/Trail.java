@@ -5,10 +5,13 @@ import dex.mapwriter3.config.ConfigurationHandler;
 import dex.mapwriter3.map.mapmode.MapMode;
 import dex.mapwriter3.util.MwReference;
 import dex.mapwriter3.util.Render;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.awt.*;
 import java.util.LinkedList;
 
+@Environment(EnvType.CLIENT)
 public class Trail {
 
     class TrailMarker {
