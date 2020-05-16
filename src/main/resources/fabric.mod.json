@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "mapwriter",
+  "version": "${version}",
+  "name": "Mapwriter 3",
+  "description": "Mapwriter 2 ported to Fabric and modern MC. A great minimap mod!",
+  "authors": [
+    "Deximus-Maximus"
+  ],
+  "contributors": [],
+  "contact": {
+    "sources": "https://github.com/dexman545/mapwriter/tree/master"
+  },
+  "license": "LGPL-3.0",
+  "icon": "assets/mapwriter/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dex.mapwriter3.MapwriterFabric"
+    ],
+    "client": [],
+    "server": []
+  },
+  "mixins": [
+    "mapwriter.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.4.0",
+    "fabric": "*"
+  }
+}
