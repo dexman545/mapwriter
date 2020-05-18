@@ -1,6 +1,5 @@
 package dex.mapwriter3.util;
 
-import net.minecraftforge.fml.common.Loader;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ public class VersionCheck implements Runnable {
 
     @Override
     public void run() {
-        InputStream in = null;
+        /*InputStream in = null;
         try {
             in = new URL(MwReference.VersionURL).openStream();
         } catch (MalformedURLException e) {
@@ -54,7 +53,7 @@ public class VersionCheck implements Runnable {
 
             isLatestVersion = MwReference.VERSION.equals(version);
         } catch (IOException e) {
-        }
+        }*/
 
     }
 

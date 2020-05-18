@@ -1,7 +1,7 @@
 package dex.mapwriter3;
 
 import com.google.common.collect.Maps;
-import dex.mapwriter3.config.Config;
+import dex.mapwriter3.config.MWConfig;
 import dex.mapwriter3.region.MwChunk;
 import dex.mapwriter3.tasks.SaveChunkTask;
 import dex.mapwriter3.tasks.UpdateSurfaceChunksTask;
@@ -14,8 +14,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.tileentity.BlockEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
@@ -108,7 +106,7 @@ public class ChunkManager {
     }
 
     public void updateSurfaceChunks() {
-        int chunksToUpdate = Math.min(this.chunkMap.size(), Config.chunksPerTick);
+        int chunksToUpdate = Math.min(this.chunkMap.size(), MWConfig.chunksPerTick);
         MwChunk[] chunkArray = new MwChunk[chunksToUpdate];
         for (int i = 0; i < chunksToUpdate; i++) {
             Map.Entry<WorldChunk, Integer> entry = this.chunkMap.getNextEntry();
@@ -118,7 +116,7 @@ public class ChunkManager {
                 WorldChunk chunk = entry.getKey();
 
                 int flags = entry.getValue();
-                if (Utils.distToChunkSq(this.mw.playerXInt, this.mw.playerZInt, chunk) <= Config.maxChunkSaveDistSq) {
+                if (Utils.distToChunkSq(this.mw.playerXInt, this.mw.playerZInt, chunk) <= MWConfig.maxChunkSaveDistSq) {
                     flags |= (VISIBLE_FLAG | VIEWED_FLAG);
                 } else {
                     flags &= ~VISIBLE_FLAG;
@@ -149,7 +147,7 @@ public class ChunkManager {
     }
 
     private void addSaveChunkTask(WorldChunk chunk) {
-        if ((MinecraftClient.getInstance().isInSingleplayer() && Config.regionFileOutputEnabledMP) || (!MinecraftClient.getInstance().isInSingleplayer() && Config.regionFileOutputEnabledSP)) {
+        if ((MinecraftClient.getInstance().isInSingleplayer() && MWConfig.regionFileOutputEnabledMP) || (!MinecraftClient.getInstance().isInSingleplayer() && MWConfig.regionFileOutputEnabledSP)) {
             if (!chunk.isEmpty()) {
                 this.mw.executor.addTask(new SaveChunkTask(copyToMwChunk(chunk), this.mw.regionManager));
             }

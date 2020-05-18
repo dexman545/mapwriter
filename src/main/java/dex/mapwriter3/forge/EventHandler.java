@@ -1,7 +1,7 @@
 package dex.mapwriter3.forge;
 
 import dex.mapwriter3.Mw;
-import dex.mapwriter3.config.Config;
+import dex.mapwriter3.config.MWConfig;
 import dex.mapwriter3.events.PlayerDeathCallback;
 import dex.mapwriter3.overlay.OverlaySlime;
 import dex.mapwriter3.util.Logging;
@@ -10,6 +10,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.LiteralText;
@@ -94,7 +95,7 @@ public class EventHandler {
 
     @SubscribeEvent
     public void onTextureStitchEventPost(TextureStitchEvent.Post event) {
-        if (Config.reloadColours) {
+        if (MWConfig.reloadColours) {
             Logging.logInfo("Skipping the first generation of blockcolours, models are not loaded yet", (Object[]) null);
         } else {
             this.mw.reloadBlockColours();
@@ -113,9 +114,9 @@ public class EventHandler {
     //this only happens if fml.skipFirstTextureLoad is enabled.
     @SubscribeEvent
     public void onGuiOpenEvent(GuiOpenEvent event) {
-        if (event.gui instanceof GuiMainMenu && Config.reloadColours) {
+        if (event.gui instanceof GuiMainMenu && MWConfig.reloadColours) {
             this.mw.reloadBlockColours();
-            Config.reloadColours = false;
+            MWConfig.reloadColours = false;
         }
     }
 }

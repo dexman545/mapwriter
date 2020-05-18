@@ -1,6 +1,6 @@
 package dex.mapwriter3.gui;
 
-import dex.mapwriter3.config.Config;
+import dex.mapwriter3.config.MWConfig;
 import dex.mapwriter3.config.ConfigurationHandler;
 import dex.mapwriter3.util.MwReference;
 import net.minecraft.client.gui.screen.Screen;
@@ -38,9 +38,9 @@ public class ModGuiConfig extends GuiConfig {
 
         // Add categories to config GUI
         list.add(categoryElement(MwReference.catOptions, "Global Options", "mw.configgui.ctgy.general"));
-        list.add(Config.fullScreenMap.categoryElement("Fullscreen map options", "mw.configgui.ctgy.fullScreenMap"));
-        list.add(Config.largeMap.categoryElement("Large map options", "mw.configgui.ctgy.largeMap"));
-        list.add(Config.smallMap.categoryElement("Small map options", "mw.configgui.ctgy.smallMap"));
+        list.add(MWConfig.fullScreenMap.categoryElement("Fullscreen map options", "mw.configgui.ctgy.fullScreenMap"));
+        list.add(MWConfig.largeMap.categoryElement("Large map options", "mw.configgui.ctgy.largeMap"));
+        list.add(MWConfig.smallMap.categoryElement("Small map options", "mw.configgui.ctgy.smallMap"));
         return list;
     }
 

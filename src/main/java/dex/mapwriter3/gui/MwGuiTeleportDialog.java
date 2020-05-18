@@ -1,7 +1,7 @@
 package dex.mapwriter3.gui;
 
 import dex.mapwriter3.Mw;
-import dex.mapwriter3.config.Config;
+import dex.mapwriter3.config.MWConfig;
 import dex.mapwriter3.map.MapView;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -30,7 +30,7 @@ public class MwGuiTeleportDialog extends MwGuiTextDialog {
         int height = this.getInputAsInt();
         if (this.inputValid) {
             height = Math.min(Math.max(0, height), 255);
-            Config.defaultTeleportHeight = height;
+            MWConfig.defaultTeleportHeight = height;
             this.mw.teleportToMapPos(this.mapView, this.teleportX, height, this.teleportZ);
             done = true;
         }

@@ -2,7 +2,7 @@ package dex.mapwriter3.map;
 
 import dex.mapwriter3.Mw;
 import dex.mapwriter3.api.MwAPI;
-import dex.mapwriter3.config.Config;
+import dex.mapwriter3.config.MWConfig;
 import dex.mapwriter3.map.mapmode.MapMode;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -43,14 +43,14 @@ public class MapView {
     private boolean fullscreenMap;
 
     public MapView(Mw mw, boolean FullscreenMap) {
-        this.minZoom = Config.zoomInLevels;
-        this.maxZoom = Config.zoomOutLevels;
-        this.undergroundMode = Config.undergroundMode;
+        this.minZoom = MWConfig.zoomInLevels;
+        this.maxZoom = MWConfig.zoomOutLevels;
+        this.undergroundMode = MWConfig.undergroundMode;
         this.fullscreenMap = FullscreenMap;
         if (this.fullscreenMap) {
-            this.setZoomLevel(Config.fullScreenZoomLevel);
+            this.setZoomLevel(MWConfig.fullScreenZoomLevel);
         }
-        this.setZoomLevel(Config.overlayZoomLevel);
+        this.setZoomLevel(MWConfig.overlayZoomLevel);
         this.setViewCentre(mw.playerX, mw.playerZ);
     }
 
@@ -97,9 +97,9 @@ public class MapView {
         }
 
         if (this.fullscreenMap) {
-            Config.fullScreenZoomLevel = this.zoomLevel;
+            MWConfig.fullScreenZoomLevel = this.zoomLevel;
         }
-        Config.overlayZoomLevel = this.zoomLevel;
+        MWConfig.overlayZoomLevel = this.zoomLevel;
 
         return this.zoomLevel;
     }

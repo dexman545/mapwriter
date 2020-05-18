@@ -1,9 +1,9 @@
 package dex.mapwriter3.map.mapmode;
 
-import dex.mapwriter3.config.Config;
+import dex.mapwriter3.config.MWConfig;
 
 public class SmallMapMode extends MapMode {
     public SmallMapMode() {
-        super(Config.smallMap);
+        super(MWConfig.smallMap);
     }
 }

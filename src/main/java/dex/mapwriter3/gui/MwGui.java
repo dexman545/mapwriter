@@ -3,7 +3,7 @@ package dex.mapwriter3.gui;
 import dex.mapwriter3.Mw;
 import dex.mapwriter3.api.IMwDataProvider;
 import dex.mapwriter3.api.MwAPI;
-import dex.mapwriter3.config.Config;
+import dex.mapwriter3.config.MWConfig;
 import dex.mapwriter3.config.WorldConfig;
 import dex.mapwriter3.forge.MwKeyHandler;
 import dex.mapwriter3.map.MapRenderer;
@@ -126,7 +126,7 @@ public class MwGui extends Screen {
 
         this.mapView.setDimension(this.mw.miniMap.view.getDimension());
         this.mapView.setViewCentreScaled(this.mw.playerX, this.mw.playerZ, this.mw.playerDimension);
-        this.mapView.setZoomLevel(Config.fullScreenZoomLevel);
+        this.mapView.setZoomLevel(MWConfig.fullScreenZoomLevel);
 
         this.initLabels();
 
@@ -139,7 +139,7 @@ public class MwGui extends Screen {
         this(mw);
         this.mapView.setDimension(dim);
         this.mapView.setViewCentreScaled(x, z, dim);
-        this.mapView.setZoomLevel(Config.fullScreenZoomLevel);
+        this.mapView.setZoomLevel(MWConfig.fullScreenZoomLevel);
     }
 
     // called when gui is displayed and every time the screen
@@ -313,7 +313,7 @@ public class MwGui extends Screen {
                     this.mw.teleportToMarker(this.mw.markerManager.selectedMarker);
                     this.exitGui();
                 } else {
-                    this.mw.mc.openScreen(new MwGuiTeleportDialog(this, this.mw, this.mapView, this.mouseBlockX, Config.defaultTeleportHeight, this.mouseBlockZ));
+                    this.mw.mc.openScreen(new MwGuiTeleportDialog(this, this.mw, this.mapView, this.mouseBlockX, MWConfig.defaultTeleportHeight, this.mouseBlockZ));
                 }
                 break;
 
@@ -351,7 +351,7 @@ public class MwGui extends Screen {
                     this.mw.markerManager.update();
                 } else if (MwKeyHandler.keyUndergroundMode.isPressed()) {
                     this.mw.toggleUndergroundMode();
-                    this.mapView.setUndergroundMode(Config.undergroundMode);
+                    this.mapView.setUndergroundMode(MWConfig.undergroundMode);
                 }
                 break;
         }
@@ -502,7 +502,7 @@ public class MwGui extends Screen {
         } else {
             int zF = (direction > 0) ? -1 : 1;
             this.mapView.zoomToPoint(this.mapView.getZoomLevel() + zF, this.mouseBlockX, this.mouseBlockZ);
-            Config.fullScreenZoomLevel = this.mapView.getZoomLevel();
+            MWConfig.fullScreenZoomLevel = this.mapView.getZoomLevel();
         }
     }
 
@@ -695,7 +695,7 @@ public class MwGui extends Screen {
         if ((m != null) && (this.mw.markerManager.selectedMarker == m)) {
             // right clicked previously selected marker.
             // edit the marker
-            if (Config.newMarkerDialog) {
+            if (MWConfig.newMarkerDialog) {
                 this.mw.mc.openScreen(new MwGuiMarkerDialogNew(this, this.mw.markerManager, m));
             } else {
                 this.mw.mc.openScreen(new MwGuiMarkerDialog(this, this.mw.markerManager, m));
@@ -718,10 +718,10 @@ public class MwGui extends Screen {
             } else {
                 // marker at mouse pointer location
                 mx = this.mouseBlockX;
-                my = (this.mouseBlockY > 0) ? this.mouseBlockY : Config.defaultTeleportHeight;
+                my = (this.mouseBlockY > 0) ? this.mouseBlockY : MWConfig.defaultTeleportHeight;
                 mz = this.mouseBlockZ;
             }
-            if (Config.newMarkerDialog) {
+            if (MWConfig.newMarkerDialog) {
                 this.mw.mc.openScreen(new MwGuiMarkerDialogNew(this, this.mw.markerManager, "", group, mx, my, mz, this.mapView.getDimension()));
             } else {
                 this.mw.mc.openScreen(new MwGuiMarkerDialog(this, this.mw.markerManager, "", group, mx, my, mz, this.mapView.getDimension()));

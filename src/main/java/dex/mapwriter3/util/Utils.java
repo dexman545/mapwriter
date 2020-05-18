@@ -1,6 +1,6 @@
 package dex.mapwriter3.util;
 
-import dex.mapwriter3.config.Config;
+import dex.mapwriter3.config.MWConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -132,7 +132,7 @@ public class Utils {
             worldName = "Realms";
         } else {
             worldName = MinecraftClient.getInstance().getCurrentServerEntry().address;
-            if (!Config.portNumberInWorldNameEnabled) {
+            if (!MWConfig.portNumberInWorldNameEnabled) {
                 worldName = worldName.substring(0, worldName.indexOf(":"));
             } else {
                 if (worldName.indexOf(":") == -1) {// standard port is missing. Adding it

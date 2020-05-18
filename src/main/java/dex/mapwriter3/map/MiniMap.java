@@ -1,7 +1,7 @@
 package dex.mapwriter3.map;
 
 import dex.mapwriter3.Mw;
-import dex.mapwriter3.config.Config;
+import dex.mapwriter3.config.MWConfig;
 import dex.mapwriter3.map.mapmode.LargeMapMode;
 import dex.mapwriter3.map.mapmode.MapMode;
 import dex.mapwriter3.map.mapmode.SmallMapMode;
@@ -28,7 +28,7 @@ public class MiniMap {
     public MiniMap(Mw mw) {
         // map view shared between large and small map modes
         this.view = new MapView(mw, false);
-        this.view.setZoomLevel(Config.overlayZoomLevel);
+        this.view.setZoomLevel(MWConfig.overlayZoomLevel);
 
         // small map mode
         this.smallMapMode = new SmallMapMode();
@@ -53,7 +53,7 @@ public class MiniMap {
 
         // sanitize overlayModeIndex loaded from config
         this.nextOverlayMode(0);
-        this.currentMap = this.mapList.get(Config.overlayModeIndex);
+        this.currentMap = this.mapList.get(MWConfig.overlayModeIndex);
     }
 
     public void close() {
@@ -64,9 +64,9 @@ public class MiniMap {
     // toggle between small map, underground map and no map
     public MapRenderer nextOverlayMode(int increment) {
         int size = this.mapList.size();
-        Config.overlayModeIndex = (Config.overlayModeIndex + size + increment) % size;
+        MWConfig.overlayModeIndex = (MWConfig.overlayModeIndex + size + increment) % size;
 
-        MapRenderer newMap = this.mapList.get(Config.overlayModeIndex);
+        MapRenderer newMap = this.mapList.get(MWConfig.overlayModeIndex);
 
         // if (newMap.getMapMode().config.enabled)
         // {

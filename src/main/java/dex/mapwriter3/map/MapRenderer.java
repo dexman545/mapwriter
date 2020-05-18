@@ -5,7 +5,7 @@ import dex.mapwriter3.Mw;
 import dex.mapwriter3.api.IMwChunkOverlay;
 import dex.mapwriter3.api.IMwDataProvider;
 import dex.mapwriter3.api.MwAPI;
-import dex.mapwriter3.config.Config;
+import dex.mapwriter3.config.MWConfig;
 import dex.mapwriter3.config.MapModeConfig;
 import dex.mapwriter3.map.mapmode.MapMode;
 import dex.mapwriter3.util.MwReference;
@@ -54,7 +54,7 @@ public class MapRenderer {
         // pixel boundaries when zoomed in.
 
         double u, v, w, h;
-        if ((!this.mapMode.config.circular) && (Config.mapPixelSnapEnabled) && (this.mapView.getZoomLevel() >= 0)) {
+        if ((!this.mapMode.config.circular) && (MWConfig.mapPixelSnapEnabled) && (this.mapView.getZoomLevel() >= 0)) {
             u = (Math.round(this.mapView.getMinX() / zoomScale) / tSize) % 1.0;
             v = (Math.round(this.mapView.getMinZ() / zoomScale) / tSize) % 1.0;
             w = Math.round(this.mapView.getWidth() / zoomScale) / tSize;
@@ -90,12 +90,12 @@ public class MapRenderer {
             this.mw.mapTexture.requestView(req, this.mw.executor, this.mw.regionManager);
 
             // draw the background texture
-            if (!Config.backgroundTextureMode.equals(Config.backgroundModeStringArray[0])) {
+            if (!MWConfig.backgroundTextureMode.equals(MWConfig.backgroundModeStringArray[0])) {
                 double bu1 = 0.0;
                 double bu2 = 1.0;
                 double bv1 = 0.0;
                 double bv2 = 1.0;
-                if (Config.backgroundTextureMode.equals(Config.backgroundModeStringArray[2])) {
+                if (MWConfig.backgroundTextureMode.equals(MWConfig.backgroundModeStringArray[2])) {
                     // background moves with map if mode is 2
                     double bSize = tSize / 256.0;
                     bu1 = u * bSize;
@@ -235,7 +235,7 @@ public class MapRenderer {
     }
 
     private void drawUndergroundMode() {
-        if (Config.undergroundMode) {
+        if (MWConfig.undergroundMode) {
             GlStateManager.pushMatrix();
             GlStateManager.translated(this.textX, this.textY, 0);
             GlStateManager.scalef(0.5f, 0.5f, 1.0f);
