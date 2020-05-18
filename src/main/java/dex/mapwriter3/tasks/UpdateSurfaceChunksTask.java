@@ -6,7 +6,6 @@ import dex.mapwriter3.region.MwChunk;
 import dex.mapwriter3.region.RegionManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.world.ChunkCoordIntPair;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +49,7 @@ public class UpdateSurfaceChunksTask extends Task {
 
     @Override
     public boolean CheckForDuplicate() {
-        Long coords = ChunkCoordIntPair.chunkXZ2Int(this.chunk.x, this.chunk.z);
+        Long coords = this.chunk.getCoordIntPair();
 
         if (!UpdateSurfaceChunksTask.chunksUpdating.containsKey(coords)) {
             UpdateSurfaceChunksTask.chunksUpdating.put(coords, this);

@@ -6,12 +6,10 @@ import dex.mapwriter3.region.IChunk;
 import dex.mapwriter3.util.Texture;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.Block;
-import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
 import org.lwjgl.opengl.GL11;
 
@@ -35,22 +33,23 @@ public class UndergroundTexture extends Texture {
     private int[] pixels;
 
     class RenderChunk implements IChunk {
-        Chunk chunk;
+        WorldChunk chunk;
 
-        public RenderChunk(Chunk chunk) {
+        public RenderChunk(WorldChunk chunk) {
             this.chunk = chunk;
         }
 
         @Override
         public int getMaxY() {
-            return this.chunk.getTopFilledSegment() + 15;
+            return this.chunk.getHighestNonEmptySectionYOffset() + 15;
         }
 
         @Override
         public int getBlockAndMetadata(int x, int y, int z) {
-            Block block = this.chunk.getBlock(x, y, z);
-            int blockid = Block.blockRegistry.getIDForObject(block);
-            int meta = this.chunk.getBlockMetadata(new BlockPos(x, y, z));
+            BlockState blockState = this.chunk.getBlockState(new BlockPos(x, y, z));
+            BlockState.serialize()
+            //int blockid = Block.blockRegistry.getIDForObject(block);
+            //int meta = this.chunk.getBlockMetadata(new BlockPos(x, y, z));
             return ((blockid & 0xfff) << 4) | (meta & 0xf);
         }
 
@@ -61,7 +60,7 @@ public class UndergroundTexture extends Texture {
 
         @Override
         public int getLightValue(int x, int y, int z) {
-            return this.chunk.getLightSubtracted(new BlockPos(x, y, z), 0);
+            return this.chunk.getLightingProvider().getLight(new BlockPos(x, y, z), 0);
         }
     }
 
@@ -159,7 +158,7 @@ public class UndergroundTexture extends Texture {
         for (int cz = this.updateZ; cz <= czMax; cz++) {
             for (int cx = this.updateX; cx <= cxMax; cx++) {
                 if (this.isChunkInTexture(cx, cz)) {
-                    Chunk chunk = world.getChunk(cx, cz);
+                    WorldChunk chunk = world.getChunk(cx, cz);
                     int tx = (cx << 4) & (this.textureSize - 1);
                     int tz = (cz << 4) & (this.textureSize - 1);
                     int pixelOffset = (tz * this.textureSize) + tx;
@@ -197,8 +196,8 @@ public class UndergroundTexture extends Texture {
                 if (columnFlag == ChunkRender.FLAG_UNPROCESSED) {
                     // if column not yet processed
                     ClientWorld world = this.mw.mc.world;
-                    Block block = world.getBlockState(new BlockPos(x, y, z)).getBlock();
-                    if ((block == null) || !block.isOpaqueCube()) {
+                    BlockState block = world.getBlockState(new BlockPos(x, y, z));
+                    if ((block == null) || !block.isOpaque()) {
                         // if block is not opaque
                         this.updateFlags[chunkOffset][columnOffset] = ChunkRender.FLAG_NON_OPAQUE;
                         this.processBlock(xi + 1, y, zi);

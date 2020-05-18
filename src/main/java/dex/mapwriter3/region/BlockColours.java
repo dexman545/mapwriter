@@ -4,6 +4,12 @@ import dex.mapwriter3.util.Logging;
 import dex.mapwriter3.util.MwReference;
 import dex.mapwriter3.util.Render;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.biome.Biome;
 
 import java.io.*;
 import java.util.*;
@@ -18,9 +24,14 @@ public class BlockColours {
     public static final String biomeSectionString = "[biomes]";
     public static final String blockSectionString = "[blocks]";
 
-    private int[] waterMultiplierArray = new int[MAX_BIOMES];
+    /*private int[] waterMultiplierArray = new int[MAX_BIOMES];
     private int[] grassMultiplierArray = new int[MAX_BIOMES];
-    private int[] foliageMultiplierArray = new int[MAX_BIOMES];
+    private int[] foliageMultiplierArray = new int[MAX_BIOMES];*/
+    private HashMap<Identifier, Integer> waterMultiplierArray = new HashMap<>();
+    private HashMap<Identifier, Integer> grassMultiplierArray = new HashMap<>();
+    private HashMap<Identifier, Integer> foliageMultiplierArray = new HashMap<>();
+
+
     private LinkedHashMap<String, BlockData> bcMap = new LinkedHashMap<String, BlockData>();
 
     public enum BlockType {
@@ -33,24 +44,26 @@ public class BlockColours {
     }
 
     public BlockColours() {
-        Arrays.fill(this.waterMultiplierArray, 0xffffff);
+        /*Arrays.fill(this.waterMultiplierArray, 0xffffff);
         Arrays.fill(this.grassMultiplierArray, 0xffffff);
-        Arrays.fill(this.foliageMultiplierArray, 0xffffff);
+        Arrays.fill(this.foliageMultiplierArray, 0xffffff);*/
     }
 
-    public String CombineBlockMeta(String BlockName, int meta) {
-        return BlockName + " " + meta;
+    public CompoundTag CombineBlockMeta(BlockState blockState) {
+        return NbtHelper.fromBlockState(blockState);
     }
 
     public String CombineBlockMeta(String BlockName, String meta) {
         return BlockName + " " + meta;
     }
 
-    public int getColour(String BlockName, int meta) {
+    public int getColour(BlockState blockState) {
         String BlockAndMeta = this.CombineBlockMeta(BlockName, meta);
         String BlockAndWildcard = this.CombineBlockMeta(BlockName, "*");
 
         BlockData data = new BlockData();
+
+        NbtHelper.fromBlockState()
 
         if (this.bcMap.containsKey(BlockAndMeta)) {
             data = this.bcMap.get(BlockAndMeta);
@@ -60,13 +73,11 @@ public class BlockColours {
         return data.color;
     }
 
-    public int getColour(int BlockAndMeta) {
-        Block block = Block.getBlockById(BlockAndMeta >> 4);
-        int meta = BlockAndMeta & 0xf;
-        return this.getColour(block.delegate.name(), meta);
+    public int getColour(BlockState BlockAndMeta) {
+        return this.getColour(BlockAndMeta, meta);
     }
 
-    public void setColour(String BlockName, String meta, int colour) {
+    public void setColour(BlockState blockState, int colour) {
         String BlockAndMeta = this.CombineBlockMeta(BlockName, meta);
 
         if (meta.equals("*")) {
@@ -85,19 +96,19 @@ public class BlockColours {
         }
     }
 
-    private int getGrassColourMultiplier(int biome) {
-        return (this.grassMultiplierArray != null) && (biome >= 0) && (biome < this.grassMultiplierArray.length) ? this.grassMultiplierArray[biome] : 0xffffff;
+    private int getGrassColourMultiplier(Identifier biome) {
+        return this.grassMultiplierArray.getOrDefault(biome, 0xffffff);
     }
 
-    private int getWaterColourMultiplier(int biome) {
-        return (this.waterMultiplierArray != null) && (biome >= 0) && (biome < this.waterMultiplierArray.length) ? this.waterMultiplierArray[biome] : 0xffffff;
+    private int getWaterColourMultiplier(Identifier biome) {
+        return this.waterMultiplierArray.getOrDefault(biome, 0xffffff);
     }
 
-    private int getFoliageColourMultiplier(int biome) {
-        return (this.foliageMultiplierArray != null) && (biome >= 0) && (biome < this.foliageMultiplierArray.length) ? this.foliageMultiplierArray[biome] : 0xffffff;
+    private int getFoliageColourMultiplier(Identifier biome) {
+        return this.foliageMultiplierArray.getOrDefault(biome, 0xffffff);
     }
 
-    public int getBiomeColour(String BlockName, int meta, int biome) {
+    public int getBiomeColour(String BlockName, int meta, Identifier biome) {
         int colourMultiplier = 0xffffff;
 
         if (this.bcMap.containsKey(this.CombineBlockMeta(BlockName, meta))) {
@@ -120,22 +131,22 @@ public class BlockColours {
         return colourMultiplier;
     }
 
-    public int getBiomeColour(int BlockAndMeta, int biome) {
+    public int getBiomeColour(int BlockAndMeta, Identifier biome) {
         Block block = Block.getBlockById(BlockAndMeta >> 4);
         int meta = BlockAndMeta & 0xf;
         return this.getBiomeColour(block.delegate.name(), meta, biome);
     }
 
-    public void setBiomeWaterShading(int biomeID, int colour) {
-        this.waterMultiplierArray[biomeID & 0xff] = colour;
+    public void setBiomeWaterShading(Identifier biomeID, int colour) {
+        this.waterMultiplierArray.put(biomeID, colour);
     }
 
-    public void setBiomeGrassShading(int biomeID, int colour) {
-        this.grassMultiplierArray[biomeID & 0xff] = colour;
+    public void setBiomeGrassShading(Identifier biomeID, int colour) {
+        this.grassMultiplierArray.put(biomeID, colour);
     }
 
-    public void setBiomeFoliageShading(int biomeID, int colour) {
-        this.foliageMultiplierArray[biomeID & 0xff] = colour;
+    public void setBiomeFoliageShading(Identifier biomeID, int colour) {
+        this.foliageMultiplierArray.put(biomeID, colour);
     }
 
     private static BlockType getBlockTypeFromString(String typeString) {
@@ -369,14 +380,14 @@ public class BlockColours {
     public void saveBiomes(Writer fout) throws IOException {
         fout.write("biome * ffffff ffffff ffffff\n");
 
-        for (int biomeId = 0; biomeId < MAX_BIOMES; biomeId++) {
-            int waterMultiplier = this.getWaterColourMultiplier(biomeId) & 0xffffff;
-            int grassMultiplier = this.getGrassColourMultiplier(biomeId) & 0xffffff;
-            int foliageMultiplier = this.getFoliageColourMultiplier(biomeId) & 0xffffff;
+        for (Identifier biomeID : Registry.BIOME.getIds()) {
+            int waterMultiplier = this.getWaterColourMultiplier(biomeID) & 0xffffff;
+            int grassMultiplier = this.getGrassColourMultiplier(biomeID) & 0xffffff;
+            int foliageMultiplier = this.getFoliageColourMultiplier(biomeID) & 0xffffff;
 
             // don't add lines that are covered by the default.
             if ((waterMultiplier != 0xffffff) || (grassMultiplier != 0xffffff) || (foliageMultiplier != 0xffffff)) {
-                fout.write(String.format("biome %d %06x %06x %06x\n", biomeId, waterMultiplier, grassMultiplier, foliageMultiplier));
+                fout.write(String.format("biome %s %06x %06x %06x\n", biomeID.toString(), waterMultiplier, grassMultiplier, foliageMultiplier));
             }
         }
     }

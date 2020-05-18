@@ -8,6 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.TextRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.screen.Screen;
 
 @Environment(EnvType.CLIENT)
 public class MwGuiLabel {
@@ -51,13 +52,14 @@ public class MwGuiLabel {
         this.updateCoords();
         if (this.str1 != null) {
             if (this.Background) {
+
                 Gui.drawRect(this.x - spacingX, this.y - MwGuiLabel.spacingY, this.x + this.w + MwGuiLabel.spacingX, this.h + this.y + MwGuiLabel.spacingY, 0x80000000);
             }
 
-            this.textRenderer.drawSplitString(this.str1, this.x, this.y, this.w, 0xffffff);
+            this.textRenderer.drawTrimmed(this.str1, this.x, this.y, this.w, 0xffffff);
 
             if (this.str2 != null) {
-                this.textRenderer.drawSplitString(this.str2, this.x + 65, this.y, this.w, 0xffffff);
+                this.textRenderer.drawTrimmed(this.str2, this.x + 65, this.y, this.w, 0xffffff);
             }
         }
     }
@@ -178,7 +180,7 @@ public class MwGuiLabel {
         if (this.s1 != null) {
             int stringwidth = Utils.getMaxWidth(this.s1, this.s2);
             this.w = stringwidth < (this.parentWidth - 20) ? stringwidth : this.parentWidth - 20;
-            this.h = this.textRenderer.splitStringWidth(this.str1, this.parentWidth > 0 ? this.parentWidth : 10);
+            this.h = this.textRenderer.getCharacterCountForWidth(this.str1, this.parentWidth > 0 ? this.parentWidth : 10);
         }
     }
 }

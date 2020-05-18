@@ -19,7 +19,7 @@ public abstract class ClientChunkManagerMixin {
     @Inject(method = "unload(II)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientChunkManager$ClientChunkMap;compareAndSet(ILnet/minecraft/world/chunk/WorldChunk;Lnet/minecraft/world/chunk/WorldChunk;)Lnet/minecraft/world/chunk/WorldChunk;"), locals = LocalCapture.PRINT)
     private void unloadChunkEvent(int chunkX, int chunkZ, CallbackInfo ci) {
         //if (this.chunks.compareAndSet(i, worldChunk, (WorldChunk)null) != null) {
-            //TODO finish, get locals
+            //TODO finish, get locals. Might use redirect of compareandset
         //}
     }
 

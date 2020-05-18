@@ -9,11 +9,9 @@ import dex.mapwriter3.util.Utils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.tileentity.BlockEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
@@ -55,6 +53,7 @@ public class ChunkManager {
                 if (storage != null) {
                     int y = (storage.getYLocation() >> 4) & 0xf;
                     dataArray[y] = storage.getData();
+                    chunk.getLightSourcesStream().toArray(); //TODO maybe this is what it's looking for?
                     lightingArray[y] = (storage.getBlocklightArray() != null) ? Arrays.copyOf(storage.getBlocklightArray().getData(), storage.getBlocklightArray().getData().length) : null;
                 }
             }

@@ -19,7 +19,7 @@ public class Texture {
 
     // allocate new texture and fill from IntBuffer
     public Texture(int w, int h, int fillColour, int minFilter, int maxFilter, int textureWrap) {
-        this.id = GlStateManager.generateTexture();
+        this.id = GlStateManager.getTexLevelParameter(); //GlStateManager.generateTexture(); //todo check
         this.w = w;
         this.h = h;
         this.pixelBuf = Utils.allocateDirectIntBuffer(w * h);

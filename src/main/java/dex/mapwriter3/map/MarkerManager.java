@@ -16,6 +16,7 @@ import net.minecraft.client.gui.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -417,7 +418,7 @@ public class MarkerManager {
         float fBlue = m.getBlue();
         float fAlpha = 0.2f;
 
-        double distance = m.getDistanceToMarker(renderManager.livingPlayer);
+        double distance = m.getDistanceToMarker(mc.player);
 
         String strText = m.name;
         String strDistance = " (" + (int) distance + "m)";

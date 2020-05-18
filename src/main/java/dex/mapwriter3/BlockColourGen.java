@@ -7,15 +7,13 @@ import dex.mapwriter3.util.Texture;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.color.world.FoliageColors;
-import net.minecraft.client.color.world.GrassColors;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 
 // Static class to generate BlockColours.
 // This is separate from BlockColours because it needs to run in the GL
@@ -33,10 +31,15 @@ public class BlockColourGen {
         // flipped icons have the U and V coords reversed (minU > maxU, minV >
         // maxV).
         // thanks go to taelnia for fixing this.
-        int iconX = Math.round((terrainTexture.w) * Math.min(icon.getMinU(), icon.getMaxU()));
+        /*int iconX = Math.round((terrainTexture.w) * Math.min(icon.getMinU(), icon.getMaxU()));
         int iconY = Math.round((terrainTexture.h) * Math.min(icon.getMinV(), icon.getMaxV()));
         int iconWidth = Math.round((terrainTexture.w) * Math.abs(icon.getMaxU() - icon.getMinU()));
-        int iconHeight = Math.round((terrainTexture.h) * Math.abs(icon.getMaxV() - icon.getMinV()));
+        int iconHeight = Math.round((terrainTexture.h) * Math.abs(icon.getMaxV() - icon.getMinV()));*/
+        int iconX = Math.round(Math.min(icon.getMinU(), icon.getMaxU()));
+        int iconY = Math.round(Math.min(icon.getMinV(), icon.getMaxV()));
+        int iconWidth = Math.round(Math.abs(icon.getMaxU() - icon.getMinU()));
+        int iconHeight = Math.round(Math.abs(icon.getMaxV() - icon.getMinV()));
+
 
         int[] pixels = new int[iconWidth * iconHeight];
 
@@ -54,7 +57,16 @@ public class BlockColourGen {
         // generate array of foliage, grass, and water colour multipliers
         // for each biome.
 
-        for (int i = 0; i < BiomeGenBase.getBiomeGenArray().length; i++) {
+        for (Biome biome : Registry.BIOME) {
+            Identifier biomeID = Registry.BIOME.getId(biome);
+
+            bc.setBiomeWaterShading(biomeID, biome.getWaterColor());
+            bc.setBiomeFoliageShading(biomeID, biome.getFoliageColor());
+            bc.setBiomeGrassShading(biomeID, biome.getGrassColorAt(1, 1)); //randomly chosen sample point
+        }
+
+
+        /*for (int i = 0; i < BiomeGenBase.getBiomeGenArray().length; i++) {
             if (BiomeGenBase.getBiomeGenArray()[i] != null) {
                 bc.setBiomeWaterShading(i, BiomeGenBase.getBiomeGenArray()[i].getWaterColorMultiplier() & 0xffffff);
 
@@ -70,7 +82,7 @@ public class BlockColourGen {
                 bc.setBiomeGrassShading(i, 0xffffff);
                 bc.setBiomeFoliageShading(i, 0xffffff);
             }
-        }
+        }*/
     }
 
     public static void genBlockColours(BlockColours bc) {
@@ -84,14 +96,14 @@ public class BlockColourGen {
         // get the bound texture id
         // int terrainTextureId = Render.getBoundTextureId();
 
-        int terrainTextureId = MinecraftClient.getInstance().renderEngine.getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
+        /*int terrainTextureId = MinecraftClient.getInstance().renderEngine.getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
 
         // create texture object from the currently bound GL texture
         if (terrainTextureId == 0) {
             Logging.log("error: could get terrain texture ID");
             return;
-        }
-        Texture terrainTexture = new Texture(terrainTextureId);
+        }*/
+        Texture terrainTexture = new Texture(9); //random id chosen //todo check
 
         double u1Last = 0;
         double u2Last = 0;
@@ -102,20 +114,18 @@ public class BlockColourGen {
         int b_count = 0;
         int s_count = 0;
 
-        for (Object oblock : Registry.BLOCK) {
-            Block block = (Block) oblock;
-            int blockID = Block.getIdFromBlock(block);
-
-            for (int dv = 0; dv < 16; dv++) {
-
+        for (Block block : Registry.BLOCK) {
+            for (BlockState blockState : block.getStateManager().getStates()) {
+                //for (int dv = 0; dv < 16; dv++) {
                 // int blockAndMeta = ((blockID & 0xfff) << 4) | (dv & 0xf);
                 int blockColour = 0;
 
-                if (block != null && block.getRenderType() != -1) {
+                if (block.getRenderType(blockState) != BlockRenderType.INVISIBLE) {
 
                     Sprite icon = null;
                     try {
-                        icon = MinecraftClient.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getTexture(block.getStateFromMeta(dv));
+                        icon = MinecraftClient.getInstance().getBlockRenderManager().getModels().getSprite(blockState);
+                        //icon = MinecraftClient.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getTexture(block.getStateFromMeta(dv));
                     } catch (Exception e) {
                         // MwUtil.log("genFromTextures: exception caught when requesting block texture for %03x:%x",
                         // blockID, dv);
@@ -133,12 +143,13 @@ public class BlockColourGen {
                             blockColour = blockColourLast;
                             s_count++;
                         } else {
+                            //terrainTexture = MinecraftClient.getInstance().getBlockRenderManager().getModels().getSprite(blockState).getAtlas();
                             blockColour = getIconMapColour(icon, terrainTexture);
                             // request icon with meta 16, carpenterblocks uses
                             // this method to get the real texture
                             // this makes the carpenterblocks render as brown
                             // blocks on the map
-                            if (((Identifier) Block.blockRegistry.getNameForObject(block)).getResourceDomain().contains("CarpentersBlocks")) {
+                            if (Registry.BLOCK.getId(block).getNamespace().contains("CarpentersBlocks")) {
                                 // icon = block.getIcon(1, 16);
                                 // blockColour = getIconMapColour(icon,
                                 // terrainTexture);
@@ -153,7 +164,8 @@ public class BlockColourGen {
                         }
                     }
                 }
-                bc.setColour(block.delegate.name(), String.valueOf(dv), blockColour);
+                bc.setColour(blockState, blockColour);
+                //}
             }
         }
 
