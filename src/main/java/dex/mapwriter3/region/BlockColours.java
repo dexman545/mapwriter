@@ -3,8 +3,11 @@ package dex.mapwriter3.region;
 import dex.mapwriter3.util.Logging;
 import dex.mapwriter3.util.MwReference;
 import dex.mapwriter3.util.Render;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.util.Identifier;
@@ -15,6 +18,7 @@ import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+@Environment(EnvType.CLIENT)
 public class BlockColours {
 
     public static final int MAX_BLOCKS = 4096;
@@ -24,15 +28,12 @@ public class BlockColours {
     public static final String biomeSectionString = "[biomes]";
     public static final String blockSectionString = "[blocks]";
 
-    /*private int[] waterMultiplierArray = new int[MAX_BIOMES];
-    private int[] grassMultiplierArray = new int[MAX_BIOMES];
-    private int[] foliageMultiplierArray = new int[MAX_BIOMES];*/
     private HashMap<Identifier, Integer> waterMultiplierArray = new HashMap<>();
     private HashMap<Identifier, Integer> grassMultiplierArray = new HashMap<>();
     private HashMap<Identifier, Integer> foliageMultiplierArray = new HashMap<>();
 
 
-    private LinkedHashMap<String, BlockData> bcMap = new LinkedHashMap<String, BlockData>();
+    private LinkedHashMap<Identifier, BlockData> bcMap = new LinkedHashMap<>();
 
     public enum BlockType {
         NORMAL,
@@ -44,55 +45,36 @@ public class BlockColours {
     }
 
     public BlockColours() {
-        /*Arrays.fill(this.waterMultiplierArray, 0xffffff);
-        Arrays.fill(this.grassMultiplierArray, 0xffffff);
-        Arrays.fill(this.foliageMultiplierArray, 0xffffff);*/
     }
 
     public CompoundTag CombineBlockMeta(BlockState blockState) {
         return NbtHelper.fromBlockState(blockState);
     }
 
-    public String CombineBlockMeta(String BlockName, String meta) {
-        return BlockName + " " + meta;
+    public String CombineBlockMeta(Identifier BlockName) {
+        return BlockName.toString();
     }
 
-    public int getColour(BlockState blockState) {
-        String BlockAndMeta = this.CombineBlockMeta(BlockName, meta);
-        String BlockAndWildcard = this.CombineBlockMeta(BlockName, "*");
+    public int getColour(Identifier block) {
 
         BlockData data = new BlockData();
 
-        NbtHelper.fromBlockState()
-
-        if (this.bcMap.containsKey(BlockAndMeta)) {
-            data = this.bcMap.get(BlockAndMeta);
-        } else if (this.bcMap.containsKey(BlockAndWildcard)) {
-            data = this.bcMap.get(BlockAndWildcard);
+        if (this.bcMap.containsKey(block)) {
+            data = this.bcMap.get(block);
         }
+
         return data.color;
     }
 
-    public int getColour(BlockState BlockAndMeta) {
-        return this.getColour(BlockAndMeta, meta);
-    }
+    public void setColour(Identifier block, int colour) {
 
-    public void setColour(BlockState blockState, int colour) {
-        String BlockAndMeta = this.CombineBlockMeta(BlockName, meta);
-
-        if (meta.equals("*")) {
-            for (int i = 0; i < 16; i++) {
-                this.setColour(BlockName, String.valueOf(i), colour);
-            }
-        }
-
-        if (this.bcMap.containsKey(BlockAndMeta)) {
-            BlockData data = this.bcMap.get(BlockAndMeta);
+        if (this.bcMap.containsKey(block)) {
+            BlockData data = this.bcMap.get(block);
             data.color = colour;
         } else {
             BlockData data = new BlockData();
             data.color = colour;
-            this.bcMap.put(BlockAndMeta, data);
+            this.bcMap.put(block, data);
         }
     }
 
@@ -108,11 +90,11 @@ public class BlockColours {
         return this.foliageMultiplierArray.getOrDefault(biome, 0xffffff);
     }
 
-    public int getBiomeColour(String BlockName, int meta, Identifier biome) {
+    public int getBiomeColour(Identifier block, Identifier biome) {
         int colourMultiplier = 0xffffff;
 
-        if (this.bcMap.containsKey(this.CombineBlockMeta(BlockName, meta))) {
-            switch (this.bcMap.get(this.CombineBlockMeta(BlockName, meta)).type) {
+        if (this.bcMap.containsKey(block)) {
+            switch (this.bcMap.get(block).type) {
                 case GRASS:
                     colourMultiplier = this.getGrassColourMultiplier(biome);
                     break;
@@ -129,12 +111,6 @@ public class BlockColours {
             }
         }
         return colourMultiplier;
-    }
-
-    public int getBiomeColour(int BlockAndMeta, Identifier biome) {
-        Block block = Block.getBlockById(BlockAndMeta >> 4);
-        int meta = BlockAndMeta & 0xf;
-        return this.getBiomeColour(block.delegate.name(), meta, biome);
     }
 
     public void setBiomeWaterShading(Identifier biomeID, int colour) {
@@ -194,52 +170,34 @@ public class BlockColours {
         return s;
     }
 
-    public BlockType getBlockType(String BlockName, int meta) {
-        String BlockAndMeta = this.CombineBlockMeta(BlockName, meta);
-        String BlockAndWildcard = this.CombineBlockMeta(BlockName, "*");
+    public BlockType getBlockType(Identifier block, int meta) {
 
         BlockData data = new BlockData();
 
-        if (this.bcMap.containsKey(BlockAndMeta)) {
-            data = this.bcMap.get(BlockAndMeta);
-        } else if (this.bcMap.containsKey(BlockAndWildcard)) {
-            data = this.bcMap.get(BlockAndWildcard);
+        if (this.bcMap.containsKey(block)) {
+            data = this.bcMap.get(block);
         }
         return data.type;
     }
 
-    public BlockType getBlockType(int BlockAndMeta) {
-        Block block = Block.getBlockById(BlockAndMeta >> 4);
-        int meta = BlockAndMeta & 0xf;
-        return this.getBlockType(block.delegate.name(), meta);
-    }
+    public void setBlockType(Identifier block, BlockType type) {
 
-    public void setBlockType(String BlockName, String meta, BlockType type) {
-        String BlockAndMeta = this.CombineBlockMeta(BlockName, meta);
-
-        if (meta.equals("*")) {
-            for (int i = 0; i < 16; i++) {
-                this.setBlockType(BlockName, String.valueOf(i), type);
-            }
-            return;
-        }
-
-        if (this.bcMap.containsKey(BlockAndMeta)) {
-            BlockData data = this.bcMap.get(BlockAndMeta);
+        if (this.bcMap.containsKey(block)) {
+            BlockData data = this.bcMap.get(block);
             data.type = type;
-            data.color = adjustBlockColourFromType(BlockName, meta, type, data.color);
+            data.color = adjustBlockColourFromType(block, type, data.color);
         } else {
             BlockData data = new BlockData();
             data.type = type;
-            this.bcMap.put(BlockAndMeta, data);
+            this.bcMap.put(block, data);
         }
     }
 
-    private static int adjustBlockColourFromType(String BlockName, String meta, BlockType type, int blockColour) {
+    private static int adjustBlockColourFromType(Identifier blockID, BlockType type, int blockColour) {
         // for normal blocks multiply the block colour by the render colour.
         // for other blocks the block colour will be multiplied by the biome
         // colour.
-        Block block = Block.getBlockFromName(BlockName);
+        Block block = Registry.BLOCK.get(blockID);
 
         switch (type) {
 
@@ -249,7 +207,7 @@ public class BlockColours {
                 // fix crash when mods don't implement getRenderColor for all
                 // block meta values.
                 try {
-                    int renderColour = block.getRenderColor(block.getStateFromMeta(Integer.parseInt(meta) & 0xf));
+                    int renderColour = block.getMaterial(block.getDefaultState()).getColor().color;
                     if (renderColour != 0xffffff) {
                         blockColour = Render.multiplyColours(blockColour, 0xff000000 | renderColour);
                     }
@@ -286,25 +244,21 @@ public class BlockColours {
     // accepts "*" wildcard for biome id (meaning for all biomes).
     private void loadBiomeLine(String[] split) {
         try {
-            int startBiomeId = 0;
-            int endBiomeId = MAX_BIOMES;
-            if (!split[1].equals("*")) {
-                startBiomeId = Integer.parseInt(split[1]);
-                endBiomeId = startBiomeId + 1;
-            }
-
-            if ((startBiomeId >= 0) && (startBiomeId < MAX_BIOMES)) {
+            for (Identifier biomeId : Registry.BIOME.getIds()) {
                 int waterMultiplier = getColourFromString(split[2]) & 0xffffff;
                 int grassMultiplier = getColourFromString(split[3]) & 0xffffff;
                 int foliageMultiplier = getColourFromString(split[4]) & 0xffffff;
 
-                for (int biomeId = startBiomeId; biomeId < endBiomeId; biomeId++) {
+                if (!split[1].equals("*") && Identifier.isValid(split[1])) {
+                    this.setBiomeWaterShading(Identifier.tryParse(split[1]), waterMultiplier);
+                    this.setBiomeGrassShading(Identifier.tryParse(split[1]), grassMultiplier);
+                    this.setBiomeFoliageShading(Identifier.tryParse(split[1]), foliageMultiplier);
+                    break;
+                } else {
                     this.setBiomeWaterShading(biomeId, waterMultiplier);
                     this.setBiomeGrassShading(biomeId, grassMultiplier);
                     this.setBiomeFoliageShading(biomeId, foliageMultiplier);
                 }
-            } else {
-                Logging.logWarning("biome ID '%d' out of range", startBiomeId);
             }
 
         } catch (NumberFormatException e) {
@@ -314,15 +268,15 @@ public class BlockColours {
 
     // read block colour values.
     // line format is:
-    // block <blockName> <blockMeta> <colour>
+    // block <blockName> <colour>
     // the biome id, meta value, and colour code are in hex.
     // accepts "*" wildcard for biome id and meta (meaning for all blocks and/or
     // meta values).
     private void loadBlockLine(String[] split) {
         try {
             // block colour line
-            int colour = getColourFromString(split[3]);
-            this.setColour(split[1], split[2], colour);
+            int colour = getColourFromString(split[2]);
+            this.setColour(Identifier.tryParse(split[1]), colour);
 
         } catch (NumberFormatException e) {
             Logging.logWarning("invalid block colour line '%s %s %s %s'", split[0], split[1], split[2], split[3]);
@@ -332,8 +286,8 @@ public class BlockColours {
     private void loadBlockTypeLine(String[] split) {
         try {
             // block type line
-            BlockType type = getBlockTypeFromString(split[3]);
-            this.setBlockType(split[1], split[2], type);
+            BlockType type = getBlockTypeFromString(split[2]);
+            this.setBlockType(Identifier.tryParse(split[1]), type);
         } catch (NumberFormatException e) {
             Logging.logWarning("invalid block colour line '%s %s %s %s'", split[0], split[1], split[2], split[3]);
         }
@@ -454,13 +408,12 @@ public class BlockColours {
         String LastBlock = "";
         List<String> colours = new ArrayList<String>();
 
-        for (Map.Entry<String, BlockData> entry : this.bcMap.entrySet()) {
-            String[] BlockAndMeta = entry.getKey().split(" ");
-            String block = BlockAndMeta[0];
+        for (Map.Entry<Identifier, BlockData> entry : this.bcMap.entrySet()) {
+            Identifier block = entry.getKey();
 
             String color = String.format("%08x", entry.getValue().color);
 
-            if (!LastBlock.equals(block) && !LastBlock.isEmpty()) {
+            if (!LastBlock.equals(block.toString()) && !LastBlock.isEmpty()) {
                 String lineStart = String.format("block %s", LastBlock);
                 writeMinimalBlockLines(fout, lineStart, colours, "00000000");
 
@@ -468,7 +421,7 @@ public class BlockColours {
             }
 
             colours.add(color);
-            LastBlock = block;
+            LastBlock = block.toString();
         }
     }
 
@@ -478,13 +431,12 @@ public class BlockColours {
         String LastBlock = "";
         List<String> blockTypes = new ArrayList<String>();
 
-        for (Map.Entry<String, BlockData> entry : this.bcMap.entrySet()) {
-            String[] BlockAndMeta = entry.getKey().split(" ");
-            String block = BlockAndMeta[0];
+        for (Map.Entry<Identifier, BlockData> entry : this.bcMap.entrySet()) {
+            Identifier block = entry.getKey();
 
             String Type = getBlockTypeAsString(entry.getValue().type);
 
-            if (!LastBlock.equals(block) && !LastBlock.isEmpty()) {
+            if (!LastBlock.equals(block.toString()) && !LastBlock.isEmpty()) {
                 String lineStart = String.format("blocktype %s", LastBlock);
                 writeMinimalBlockLines(fout, lineStart, blockTypes, getBlockTypeAsString(BlockType.NORMAL));
 
@@ -492,7 +444,7 @@ public class BlockColours {
             }
 
             blockTypes.add(Type);
-            LastBlock = block;
+            LastBlock = block.toString();
         }
     }
 

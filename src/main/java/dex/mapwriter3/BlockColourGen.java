@@ -115,58 +115,56 @@ public class BlockColourGen {
         int s_count = 0;
 
         for (Block block : Registry.BLOCK) {
-            for (BlockState blockState : block.getStateManager().getStates()) {
-                //for (int dv = 0; dv < 16; dv++) {
-                // int blockAndMeta = ((blockID & 0xfff) << 4) | (dv & 0xf);
-                int blockColour = 0;
 
-                if (block.getRenderType(blockState) != BlockRenderType.INVISIBLE) {
+            //for (int dv = 0; dv < 16; dv++) {
+            // int blockAndMeta = ((blockID & 0xfff) << 4) | (dv & 0xf);
+            int blockColour = 0;
 
-                    Sprite icon = null;
-                    try {
-                        icon = MinecraftClient.getInstance().getBlockRenderManager().getModels().getSprite(blockState);
-                        //icon = MinecraftClient.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getTexture(block.getStateFromMeta(dv));
-                    } catch (Exception e) {
-                        // MwUtil.log("genFromTextures: exception caught when requesting block texture for %03x:%x",
-                        // blockID, dv);
-                        // e.printStackTrace();
-                        e_count++;
-                    }
+            if (block.getRenderType(block.getDefaultState()) != BlockRenderType.INVISIBLE) {
 
-                    if (icon != null) {
-                        double u1 = icon.getMinU();
-                        double u2 = icon.getMaxU();
-                        double v1 = icon.getMinV();
-                        double v2 = icon.getMaxV();
+                Sprite icon = null;
+                try {
+                    icon = MinecraftClient.getInstance().getBlockRenderManager().getModels().getSprite(block.getDefaultState());
+                    //icon = MinecraftClient.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getTexture(block.getStateFromMeta(dv));
+                } catch (Exception e) {
+                    // MwUtil.log("genFromTextures: exception caught when requesting block texture for %03x:%x",
+                    // blockID, dv);
+                    // e.printStackTrace();
+                    e_count++;
+                }
 
-                        if ((u1 == u1Last) && (u2 == u2Last) && (v1 == v1Last) && (v2 == v2Last)) {
-                            blockColour = blockColourLast;
-                            s_count++;
-                        } else {
-                            //terrainTexture = MinecraftClient.getInstance().getBlockRenderManager().getModels().getSprite(blockState).getAtlas();
-                            blockColour = getIconMapColour(icon, terrainTexture);
-                            // request icon with meta 16, carpenterblocks uses
-                            // this method to get the real texture
-                            // this makes the carpenterblocks render as brown
-                            // blocks on the map
-                            if (Registry.BLOCK.getId(block).getNamespace().contains("CarpentersBlocks")) {
-                                // icon = block.getIcon(1, 16);
-                                // blockColour = getIconMapColour(icon,
-                                // terrainTexture);
-                            }
+                if (icon != null) {
+                    double u1 = icon.getMinU();
+                    double u2 = icon.getMaxU();
+                    double v1 = icon.getMinV();
+                    double v2 = icon.getMaxV();
 
-                            u1Last = u1;
-                            u2Last = u2;
-                            v1Last = v1;
-                            v2Last = v2;
-                            blockColourLast = blockColour;
-                            b_count++;
+                    if ((u1 == u1Last) && (u2 == u2Last) && (v1 == v1Last) && (v2 == v2Last)) {
+                        blockColour = blockColourLast;
+                        s_count++;
+                    } else {
+                        //terrainTexture = MinecraftClient.getInstance().getBlockRenderManager().getModels().getSprite(blockState).getAtlas();
+                        blockColour = getIconMapColour(icon, terrainTexture);
+                        // request icon with meta 16, carpenterblocks uses
+                        // this method to get the real texture
+                        // this makes the carpenterblocks render as brown
+                        // blocks on the map
+                        if (Registry.BLOCK.getId(block).getNamespace().contains("CarpentersBlocks")) {
+                            // icon = block.getIcon(1, 16);
+                            // blockColour = getIconMapColour(icon,
+                            // terrainTexture);
                         }
+
+                        u1Last = u1;
+                        u2Last = u2;
+                        v1Last = v1;
+                        v2Last = v2;
+                        blockColourLast = blockColour;
+                        b_count++;
                     }
                 }
-                bc.setColour(blockState, blockColour);
-                //}
             }
+            bc.setColour(Registry.BLOCK.getId(block), blockColour);
         }
 
         Logging.log("processed %d block textures, %d skipped, %d exceptions", b_count, s_count, e_count);
