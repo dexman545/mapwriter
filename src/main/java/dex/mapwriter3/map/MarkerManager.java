@@ -1,6 +1,7 @@
 package dex.mapwriter3.map;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import dex.mapwriter3.config.ConfigurationHandler;
 import dex.mapwriter3.config.MWConfig;
 import dex.mapwriter3.config.WorldConfig;
 import dex.mapwriter3.map.mapmode.MapMode;
@@ -292,16 +293,16 @@ public class MarkerManager {
     }
 
     public void drawMarkersWorld(float partialTicks) {
-        if (!MWConfig.drawMarkersInWorld && !MWConfig.drawMarkersNameInWorld) {
+        if (!ConfigurationHandler.mwConfig.drawMarkersInWorld() && !ConfigurationHandler.mwConfig.drawMarkersNameInWorld()) {
             return;
         }
 
         for (Marker m : this.visibleMarkerList) {
             if (m.dimension == MinecraftClient.getInstance().player.dimension) {
-                if (MWConfig.drawMarkersInWorld) {
+                if (ConfigurationHandler.mwConfig.drawMarkersInWorld()) {
                     this.drawBeam(m, partialTicks);
                 }
-                if (MWConfig.drawMarkersNameInWorld) {
+                if (ConfigurationHandler.mwConfig.drawMarkersNameInWorld()) {
                     this.drawLabel(m);
                 }
             }

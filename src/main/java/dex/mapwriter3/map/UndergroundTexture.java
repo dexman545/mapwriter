@@ -8,7 +8,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
 import org.lwjgl.opengl.GL11;
@@ -45,17 +47,16 @@ public class UndergroundTexture extends Texture {
         }
 
         @Override
-        public int getBlockAndMetadata(int x, int y, int z) {
+        public Identifier getBlockAndMetadata(int x, int y, int z) {
             BlockState blockState = this.chunk.getBlockState(new BlockPos(x, y, z));
-            BlockState.serialize()
             //int blockid = Block.blockRegistry.getIDForObject(block);
             //int meta = this.chunk.getBlockMetadata(new BlockPos(x, y, z));
-            return ((blockid & 0xfff) << 4) | (meta & 0xf);
+            return Registry.BLOCK.getId(blockState.getBlock());
         }
 
         @Override
         public int getBiome(int x, int z) {
-            return this.chunk.getBiomeArray()[(z * 16) + x];
+            return this.chunk.getBiomeArray().toIntArray()[(z * 16) + x]; //todo check this is right
         }
 
         @Override

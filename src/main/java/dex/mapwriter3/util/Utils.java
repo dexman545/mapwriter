@@ -132,7 +132,7 @@ public class Utils {
             worldName = "Realms";
         } else {
             worldName = MinecraftClient.getInstance().getCurrentServerEntry().address;
-            if (!MWConfig.portNumberInWorldNameEnabled) {
+            if (!ConfigurationHandler.mwConfig.portNumberInWorldNameEnabled()) {
                 worldName = worldName.substring(0, worldName.indexOf(":"));
             } else {
                 if (worldName.indexOf(":") == -1) {// standard port is missing. Adding it

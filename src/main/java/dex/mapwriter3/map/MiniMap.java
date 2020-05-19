@@ -28,7 +28,7 @@ public class MiniMap {
     public MiniMap(Mw mw) {
         // map view shared between large and small map modes
         this.view = new MapView(mw, false);
-        this.view.setZoomLevel(MWConfig.overlayZoomLevel);
+        this.view.setZoomLevel(ConfigurationHandler.mwConfig.overlayZoomLevel());
 
         // small map mode
         this.smallMapMode = new SmallMapMode();
@@ -53,7 +53,7 @@ public class MiniMap {
 
         // sanitize overlayModeIndex loaded from config
         this.nextOverlayMode(0);
-        this.currentMap = this.mapList.get(MWConfig.overlayModeIndex);
+        this.currentMap = this.mapList.get(ConfigurationHandler.mwConfig.overlayModeIndex());
     }
 
     public void close() {
@@ -64,9 +64,9 @@ public class MiniMap {
     // toggle between small map, underground map and no map
     public MapRenderer nextOverlayMode(int increment) {
         int size = this.mapList.size();
-        MWConfig.overlayModeIndex = (MWConfig.overlayModeIndex + size + increment) % size;
+        ConfigurationHandler.mwConfig.overlayModeIndex() = (ConfigurationHandler.mwConfig.overlayModeIndex() + size + increment) % size;
 
-        MapRenderer newMap = this.mapList.get(MWConfig.overlayModeIndex);
+        MapRenderer newMap = this.mapList.get(ConfigurationHandler.mwConfig.overlayModeIndex());
 
         // if (newMap.getMapMode().config.enabled)
         // {

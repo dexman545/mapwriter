@@ -4,6 +4,6 @@ import dex.mapwriter3.config.MWConfig;
 
 public class FullScreenMapMode extends MapMode {
     public FullScreenMapMode() {
-        super(MWConfig.fullScreenMap);
+        super(ConfigurationHandler.mwConfig.fullScreenMap());
     }
 }

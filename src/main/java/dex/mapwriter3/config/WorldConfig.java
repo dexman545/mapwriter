@@ -2,18 +2,23 @@ package dex.mapwriter3.config;
 
 import dex.mapwriter3.Mw;
 import dex.mapwriter3.util.MwReference;
-import dex.mapwriter3.util.Utils;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.common.config.Configuration;
+import org.aeonbits.owner.ConfigFactory;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Environment(EnvType.CLIENT)
 public class WorldConfig {
     private static WorldConfig instance = null;
 
-    public Configuration worldConfiguration = null;
+    public WorldConfigStorage worldConfiguration;
+    private String worldFile;
 
     // list of available dimensions
     public List<DimensionType> dimensionList = new ArrayList<DimensionType>();
@@ -21,7 +26,12 @@ public class WorldConfig {
     private WorldConfig() {
         // load world specific config file
         File worldConfigFile = new File(Mw.getInstance().worldDir, MwReference.worldDirConfigName);
-        this.worldConfiguration = new Configuration(worldConfigFile);
+        worldFile = worldConfigFile.getAbsolutePath();
+
+        ConfigFactory.setProperty("worldDir", worldConfigFile.getAbsolutePath());
+
+
+        this.worldConfiguration = ConfigFactory.create(WorldConfigStorage.class);
 
         this.InitDimensionList();
     }
@@ -39,26 +49,29 @@ public class WorldConfig {
     }
 
     public void saveWorldConfig() {
-        this.worldConfiguration.save();
+        try {
+            this.worldConfiguration.store(new FileOutputStream(worldFile), null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // Dimension List
     public void InitDimensionList() {
         this.dimensionList.clear();
-        this.worldConfiguration.get(MwReference.catWorld, "dimensionList", Utils.integerListToIntArray(this.dimensionList));
-        this.addDimension(0);
+        this.worldConfiguration.setProperty("dimensionList", null);
+        this.worldConfiguration.getProperty("dimensionList", null);
+        //this.worldConfiguration.get("dimensionList", Utils.integerListToIntArray(this.dimensionList));
+        this.addDimension(DimensionType.OVERWORLD);
         this.cleanDimensionList();
     }
 
     public void addDimension(DimensionType dimension) {
-        int i = this.dimensionList.indexOf(dimension);
-        if (i < 0) {
-            this.dimensionList.add(dimension);
-        }
+        this.dimensionList.add(dimension);
     }
 
-    public void cleanDimensionList() {
-        List<DimensionType> dimensionListCopy = new ArrayList<DimensionType>(this.dimensionList);
+    public void cleanDimensionList() { //wtf does this do
+        List<DimensionType> dimensionListCopy = new ArrayList<>(this.dimensionList);
         this.dimensionList.clear();
         for (DimensionType dimension : dimensionListCopy) {
             this.addDimension(dimension);

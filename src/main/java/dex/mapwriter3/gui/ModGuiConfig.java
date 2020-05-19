@@ -38,9 +38,9 @@ public class ModGuiConfig extends GuiConfig {
 
         // Add categories to config GUI
         list.add(categoryElement(MwReference.catOptions, "Global Options", "mw.configgui.ctgy.general"));
-        list.add(MWConfig.fullScreenMap.categoryElement("Fullscreen map options", "mw.configgui.ctgy.fullScreenMap"));
-        list.add(MWConfig.largeMap.categoryElement("Large map options", "mw.configgui.ctgy.largeMap"));
-        list.add(MWConfig.smallMap.categoryElement("Small map options", "mw.configgui.ctgy.smallMap"));
+        list.add(ConfigurationHandler.mwConfig.fullScreenMap().categoryElement("Fullscreen map options", "mw.configgui.ctgy.fullScreenMap"));
+        list.add(ConfigurationHandler.mwConfig.largeMap().categoryElement("Large map options", "mw.configgui.ctgy.largeMap"));
+        list.add(ConfigurationHandler.mwConfig.smallMap().categoryElement("Small map options", "mw.configgui.ctgy.smallMap"));
         return list;
     }
 

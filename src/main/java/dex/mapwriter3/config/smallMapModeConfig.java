@@ -1,4 +1,4 @@
-package dex.mapwriter3.config;
+/*package dex.mapwriter3.config;
 
 import dex.mapwriter3.gui.ModGuiConfig.ModBooleanEntry;
 import dex.mapwriter3.util.MwReference;
@@ -30,4 +30,4 @@ public class smallMapModeConfig extends largeMapModeConfig {
         ConfigurationHandler.configuration.get(MwReference.catSmallMapConfig, "enabled", this.enabledDef).setRequiresWorldRestart(true);
         ConfigurationHandler.configuration.get(this.configCategory, "rotate", this.rotate).setConfigEntryClass(ModBooleanEntry.class);
     }
-}
+}*/

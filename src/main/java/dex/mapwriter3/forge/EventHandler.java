@@ -95,7 +95,7 @@ public class EventHandler {
 
     @SubscribeEvent
     public void onTextureStitchEventPost(TextureStitchEvent.Post event) {
-        if (MWConfig.reloadColours) {
+        if (ConfigurationHandler.mwConfig.reloadColours()) {
             Logging.logInfo("Skipping the first generation of blockcolours, models are not loaded yet", (Object[]) null);
         } else {
             this.mw.reloadBlockColours();
@@ -114,9 +114,9 @@ public class EventHandler {
     //this only happens if fml.skipFirstTextureLoad is enabled.
     @SubscribeEvent
     public void onGuiOpenEvent(GuiOpenEvent event) {
-        if (event.gui instanceof GuiMainMenu && MWConfig.reloadColours) {
+        if (event.gui instanceof GuiMainMenu && ConfigurationHandler.mwConfig.reloadColours()) {
             this.mw.reloadBlockColours();
-            MWConfig.reloadColours = false;
+            ConfigurationHandler.mwConfig.reloadColours() = false;
         }
     }
 }

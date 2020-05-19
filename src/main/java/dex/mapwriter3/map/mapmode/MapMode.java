@@ -1,5 +1,6 @@
 package dex.mapwriter3.map.mapmode;
 
+import dex.mapwriter3.config.ConfigurationHandler;
 import dex.mapwriter3.config.MapModeConfig;
 import dex.mapwriter3.map.MapView;
 import net.fabricmc.api.EnvType;
@@ -39,8 +40,8 @@ public class MapMode {
 
     public MapModeConfig config;
 
-    public MapMode(MapModeConfig config) {
-        this.config = config;
+    public MapMode() {
+        this.config = ConfigurationHandler.mapModeConfig;
         this.updateMargin();
     }
 
@@ -60,43 +61,43 @@ public class MapMode {
     }
 
     public void updateMargin() {
-        if (this.lastPos.equals(this.config.Position)) {
+        if (this.lastPos.equals(this.config.Position())) {
             return;
         }
 
         // top right
-        if (this.config.Position.equals(MapModeConfig.miniMapPositionStringArray[0])) {
+        if (this.config.Position().equals(MapModeConfig.miniMapPositionStringArray[0])) {
             this.marginTop = 10;
             this.marginBottom = -1;
             this.marginLeft = -1;
             this.marginRight = 10;
         }
         // top left
-        else if (this.config.Position.equals(MapModeConfig.miniMapPositionStringArray[1])) {
+        else if (this.config.Position().equals(MapModeConfig.miniMapPositionStringArray[1])) {
             this.marginTop = 10;
             this.marginBottom = -1;
             this.marginLeft = 10;
             this.marginRight = -1;
         }
         // botom right
-        else if (this.config.Position.equals(MapModeConfig.miniMapPositionStringArray[2])) {
+        else if (this.config.Position().equals(MapModeConfig.miniMapPositionStringArray[2])) {
             this.marginTop = -1;
             this.marginBottom = 40;
             this.marginLeft = -1;
             this.marginRight = 10;
         }
         // botom left
-        else if (this.config.Position.equals(MapModeConfig.miniMapPositionStringArray[3])) {
+        else if (this.config.Position().equals(MapModeConfig.miniMapPositionStringArray[3])) {
             this.marginTop = -1;
             this.marginBottom = 40;
             this.marginLeft = 10;
             this.marginRight = -1;
-        } else if (this.config.Position.equals("FullScreen")) {
+        } else if (this.config.Position().equals("FullScreen")) {
             this.marginTop = 0;
             this.marginBottom = 0;
             this.marginLeft = 0;
             this.marginRight = 0;
-        } else if (this.config.Position.equals("Large")) {
+        } else if (this.config.Position().equals("Large")) {
             this.marginTop = 10;
             this.marginBottom = 40;
             this.marginLeft = 40;
@@ -106,7 +107,7 @@ public class MapMode {
     }
 
     private void update() {
-        int size = (this.sh * this.config.heightPercent) / 100;
+        int size = (this.sh * this.config.heightPercent()) / 100;
         int x, y;
 
         // calculate map x position and width
@@ -146,7 +147,7 @@ public class MapMode {
         this.xTranslation = x + (this.w >> 1);
         this.yTranslation = y + (this.h >> 1);
 
-        if (this.config.circular) {
+        if (this.config.circular()) {
             this.w = this.h;
         }
 
@@ -186,7 +187,7 @@ public class MapMode {
         double zRel = (bZ - mapView.getZ()) / mapView.getHeight();
         double limit = 0.49;
 
-        if (!this.config.circular) {
+        if (!this.config.circular()) {
             if (xRel < -limit) {
                 zRel = (-limit * zRel) / xRel;
                 xRel = -limit;

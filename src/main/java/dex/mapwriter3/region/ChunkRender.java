@@ -1,5 +1,6 @@
 package dex.mapwriter3.region;
 
+import dex.mapwriter3.config.ConfigurationHandler;
 import dex.mapwriter3.config.MWConfig;
 
 public class ChunkRender {
@@ -43,7 +44,7 @@ public class ChunkRender {
         // emphasize small differences in height, but as the difference in
         // height increases,
         // don't increase so much
-        if (MWConfig.moreRealisticMap) {
+        if (ConfigurationHandler.mwConfig.moreRealisticMap()) {
             return Math.atan(heightDiffFactor) * 0.3;
         }
 

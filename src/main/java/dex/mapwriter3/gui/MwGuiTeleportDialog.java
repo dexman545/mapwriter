@@ -30,7 +30,7 @@ public class MwGuiTeleportDialog extends MwGuiTextDialog {
         int height = this.getInputAsInt();
         if (this.inputValid) {
             height = Math.min(Math.max(0, height), 255);
-            MWConfig.defaultTeleportHeight = height;
+            ConfigurationHandler.mwConfig.defaultTeleportHeight() = height;
             this.mw.teleportToMapPos(this.mapView, this.teleportX, height, this.teleportZ);
             done = true;
         }

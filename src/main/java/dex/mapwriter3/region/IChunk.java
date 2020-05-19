@@ -1,7 +1,9 @@
 package dex.mapwriter3.region;
 
+import net.minecraft.util.Identifier;
+
 public interface IChunk {
-    public int getBlockAndMetadata(int x, int y, int z);
+    public Identifier getBlockAndMetadata(int x, int y, int z);
 
     public int getBiome(int x, int z);
 

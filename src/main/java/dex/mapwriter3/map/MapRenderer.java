@@ -5,6 +5,7 @@ import dex.mapwriter3.Mw;
 import dex.mapwriter3.api.IMwChunkOverlay;
 import dex.mapwriter3.api.IMwDataProvider;
 import dex.mapwriter3.api.MwAPI;
+import dex.mapwriter3.config.ConfigurationHandler;
 import dex.mapwriter3.config.MWConfig;
 import dex.mapwriter3.config.MapModeConfig;
 import dex.mapwriter3.map.mapmode.MapMode;
@@ -12,7 +13,6 @@ import dex.mapwriter3.util.MwReference;
 import dex.mapwriter3.util.Render;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.renderer.GlStateManager;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ public class MapRenderer {
         // pixel boundaries when zoomed in.
 
         double u, v, w, h;
-        if ((!this.mapMode.config.circular) && (MWConfig.mapPixelSnapEnabled) && (this.mapView.getZoomLevel() >= 0)) {
+        if ((!this.mapMode.config.circular()) && (ConfigurationHandler.mwConfig.mapPixelSnapEnabled()) && (this.mapView.getZoomLevel() >= 0)) {
             u = (Math.round(this.mapView.getMinX() / zoomScale) / tSize) % 1.0;
             v = (Math.round(this.mapView.getMinZ() / zoomScale) / tSize) % 1.0;
             w = Math.round(this.mapView.getWidth() / zoomScale) / tSize;
@@ -68,10 +68,10 @@ public class MapRenderer {
         }
         GlStateManager.pushMatrix();
 
-        if (this.mapMode.config.rotate && (this.mapMode.config.circular == true)) {
+        if (this.mapMode.config.rotate() && (this.mapMode.config.circular())) {
             GlStateManager.rotatef(this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
         }
-        if (this.mapMode.config.circular) {
+        if (this.mapMode.config.circular()) {
             Render.setCircularStencil(0, 0, this.mapMode.h / 2.0);
         }
 
@@ -79,9 +79,9 @@ public class MapRenderer {
             // draw the underground map
             this.mw.undergroundMapTexture.requestView(this.mapView);
             // underground map needs to have a black background
-            Render.setColourWithAlphaPercent(0x000000, this.mapMode.config.alphaPercent);
+            Render.setColourWithAlphaPercent(0x000000, this.mapMode.config.alphaPercent());
             Render.drawRect(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h);
-            Render.setColourWithAlphaPercent(0xffffff, this.mapMode.config.alphaPercent);
+            Render.setColourWithAlphaPercent(0xffffff, this.mapMode.config.alphaPercent());
             this.mw.undergroundMapTexture.bind();
             Render.drawTexturedRect(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h, u, v, u + w, v + h);
         } else {
@@ -90,12 +90,12 @@ public class MapRenderer {
             this.mw.mapTexture.requestView(req, this.mw.executor, this.mw.regionManager);
 
             // draw the background texture
-            if (!MWConfig.backgroundTextureMode.equals(MWConfig.backgroundModeStringArray[0])) {
+            if (!ConfigurationHandler.mwConfig.backgroundTextureMode().equals(MWConfig.backgroundMode.NONE)) {
                 double bu1 = 0.0;
                 double bu2 = 1.0;
                 double bv1 = 0.0;
                 double bv2 = 1.0;
-                if (MWConfig.backgroundTextureMode.equals(MWConfig.backgroundModeStringArray[2])) {
+                if (ConfigurationHandler.mwConfig.backgroundTextureMode().equals(MWConfig.backgroundMode.PANNING)) {
                     // background moves with map if mode is 2
                     double bSize = tSize / 256.0;
                     bu1 = u * bSize;
@@ -104,11 +104,11 @@ public class MapRenderer {
                     bv2 = (v + h) * bSize;
                 }
                 this.mw.mc.renderEngine.bindTexture(MwReference.backgroundTexture);
-                Render.setColourWithAlphaPercent(0xffffff, this.mapMode.config.alphaPercent);
+                Render.setColourWithAlphaPercent(0xffffff, this.mapMode.config.alphaPercent());
                 Render.drawTexturedRect(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h, bu1, bv1, bu2, bv2);
             } else {
                 // mode 0, no background texture
-                Render.setColourWithAlphaPercent(0x000000, this.mapMode.config.alphaPercent);
+                Render.setColourWithAlphaPercent(0x000000, this.mapMode.config.alphaPercent());
                 Render.drawRect(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h);
             }
 
@@ -116,7 +116,7 @@ public class MapRenderer {
             // loaded by the background thread)
             if (this.mw.mapTexture.isLoaded(req)) {
                 this.mw.mapTexture.bind();
-                Render.setColourWithAlphaPercent(0xffffff, this.mapMode.config.alphaPercent);
+                Render.setColourWithAlphaPercent(0xffffff, this.mapMode.config.alphaPercent());
                 Render.drawTexturedRect(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h, u, v, u + w, v + h);
             }
         }
@@ -131,14 +131,14 @@ public class MapRenderer {
             GlStateManager.popMatrix();
         }
 
-        if (this.mapMode.config.circular) {
+        if (this.mapMode.config.circular()) {
             Render.disableStencil();
         }
         GlStateManager.popMatrix();
     }
 
     private void drawBorder() {
-        if (this.mapMode.config.circular) {
+        if (this.mapMode.config.circular()) {
             this.mw.mc.renderEngine.bindTexture(MwReference.roundMapTexture);
         } else {
             this.mw.mc.renderEngine.bindTexture(MwReference.squareMapTexture);
@@ -155,11 +155,11 @@ public class MapRenderer {
 
         // the arrow only needs to be rotated if the map is NOT rotated
         GlStateManager.translated(p.x, p.y, 0.0);
-        if (!this.mapMode.config.rotate || (this.mapMode.config.circular == false)) {
+        if (!this.mapMode.config.rotate() || (!this.mapMode.config.circular())) {
             GlStateManager.rotatef(-this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
         }
 
-        double arrowSize = this.mapMode.config.playerArrowSize;
+        double arrowSize = this.mapMode.config.playerArrowSize();
         Render.setColour(0xffffffff);
         this.mw.mc.renderEngine.bindTexture(MwReference.playerArrowTexture);
         Render.drawTexturedRect(-arrowSize, -arrowSize, arrowSize * 2, arrowSize * 2, 0.0, 0.0, 1.0, 1.0);
@@ -169,7 +169,7 @@ public class MapRenderer {
     private void drawIcons() {
         GlStateManager.pushMatrix();
 
-        if (this.mapMode.config.rotate && (this.mapMode.config.circular == true)) {
+        if (this.mapMode.config.rotate() && (this.mapMode.config.circular())) {
             GlStateManager.rotatef(this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
         }
 
@@ -182,9 +182,9 @@ public class MapRenderer {
         }
 
         // draw north arrow
-        if (this.mapMode.config.rotate) {
+        if (this.mapMode.config.rotate()) {
             double y = this.mapMode.h / 2.0;
-            double arrowSize = this.mapMode.config.playerArrowSize;
+            double arrowSize = this.mapMode.config.playerArrowSize();
             Render.setColour(0xffffffff);
             this.mw.mc.renderEngine.bindTexture(MwReference.northArrowTexture);
             Render.drawTexturedRect(-arrowSize, -y - (arrowSize * 2), arrowSize * 2, arrowSize * 2, 0.0, 0.0, 1.0, 1.0);
@@ -207,10 +207,10 @@ public class MapRenderer {
 
     private void drawCoords() {
         // draw coordinates
-        if (!this.mapMode.config.coordsMode.equals(MapModeConfig.coordsModeStringArray[0])) {
+        if (!(this.mapMode.config.coordsMode()).equals(MapModeConfig.coordsMode.DISABLED)) {
             GlStateManager.pushMatrix();
             GlStateManager.translated(this.textX, this.textY, 0);
-            if (this.mapMode.config.coordsMode.equals(MapModeConfig.coordsModeStringArray[1])) {
+            if (this.mapMode.config.coordsMode().equals(MapModeConfig.coordsMode.SMALL)) {
                 GlStateManager.scalef(0.5f, 0.5f, 1.0f);
                 this.textOffset = (int) (this.textOffset * 0.5f);
             }
@@ -221,10 +221,10 @@ public class MapRenderer {
     }
 
     private void drawBiomeName() {
-        if (!this.mapMode.config.biomeMode.equals(MapModeConfig.coordsModeStringArray[0])) {
+        if (!(this.mapMode.config.biomeMode().equals(MapModeConfig.coordsMode.DISABLED))) {
             GlStateManager.pushMatrix();
             GlStateManager.translated(this.textX, this.textY, 0);
-            if (this.mapMode.config.biomeMode.equals(MapModeConfig.coordsModeStringArray[1])) {
+            if (this.mapMode.config.biomeMode().equals(MapModeConfig.coordsMode.SMALL)) {
                 GlStateManager.scalef(0.5f, 0.5f, 1.0f);
                 this.textOffset = (int) (this.textOffset * 0.5f);
             }
@@ -235,7 +235,7 @@ public class MapRenderer {
     }
 
     private void drawUndergroundMode() {
-        if (MWConfig.undergroundMode) {
+        if (ConfigurationHandler.mwConfig.undergroundMode()) {
             GlStateManager.pushMatrix();
             GlStateManager.translated(this.textX, this.textY, 0);
             GlStateManager.scalef(0.5f, 0.5f, 1.0f);
@@ -278,7 +278,7 @@ public class MapRenderer {
         // draw background, the map texture, and enabled overlays
         this.drawMap();
 
-        if (this.mapMode.config.borderMode) {
+        if (this.mapMode.config.borderMode()) {
             this.drawBorder();
         }
         this.drawIcons();

@@ -2,7 +2,7 @@ package dex.mapwriter3.map;
 
 import dex.mapwriter3.Mw;
 import dex.mapwriter3.api.MwAPI;
-import dex.mapwriter3.config.MWConfig;
+import dex.mapwriter3.config.ConfigurationHandler;
 import dex.mapwriter3.map.mapmode.MapMode;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -43,14 +43,14 @@ public class MapView {
     private boolean fullscreenMap;
 
     public MapView(Mw mw, boolean FullscreenMap) {
-        this.minZoom = MWConfig.zoomInLevels;
-        this.maxZoom = MWConfig.zoomOutLevels;
-        this.undergroundMode = MWConfig.undergroundMode;
+        this.minZoom = ConfigurationHandler.mwConfig.zoomInLevels();
+        this.maxZoom = ConfigurationHandler.mwConfig.zoomOutLevels();
+        this.undergroundMode = ConfigurationHandler.mwConfig.undergroundMode();
         this.fullscreenMap = FullscreenMap;
         if (this.fullscreenMap) {
-            this.setZoomLevel(MWConfig.fullScreenZoomLevel);
+            this.setZoomLevel(ConfigurationHandler.mwConfig.fullScreenZoomLevel());
         }
-        this.setZoomLevel(MWConfig.overlayZoomLevel);
+        this.setZoomLevel(ConfigurationHandler.mwConfig.overlayZoomLevel());
         this.setViewCentre(mw.playerX, mw.playerZ);
     }
 
@@ -97,9 +97,9 @@ public class MapView {
         }
 
         if (this.fullscreenMap) {
-            MWConfig.fullScreenZoomLevel = this.zoomLevel;
+            ConfigurationHandler.mwConfig.setProperty("fullScreenZoomLevel", String.valueOf(this.zoomLevel));
         }
-        MWConfig.overlayZoomLevel = this.zoomLevel;
+        ConfigurationHandler.mwConfig.setProperty("overlayZoomLevel", String.valueOf(this.zoomLevel));
 
         return this.zoomLevel;
     }

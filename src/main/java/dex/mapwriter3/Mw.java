@@ -1,6 +1,5 @@
 package dex.mapwriter3;
 
-import dex.mapwriter3.config.MWConfig;
 import dex.mapwriter3.config.ConfigurationHandler;
 import dex.mapwriter3.config.WorldConfig;
 import dex.mapwriter3.forge.MwForge;
@@ -100,16 +99,16 @@ public class Mw {
     }
 
     public void setTextureSize() {
-        if (MWConfig.configTextureSize != this.textureSize) {
+        if (ConfigurationHandler.mwConfig.configTextureSize() != this.textureSize) {
             int maxTextureSize = Render.getMaxTextureSize();
             int textureSize = 1024;
-            while ((textureSize <= maxTextureSize) && (textureSize <= MWConfig.configTextureSize)) {
+            while ((textureSize <= maxTextureSize) && (textureSize <= ConfigurationHandler.mwConfig.configTextureSize())) {
                 textureSize *= 2;
             }
             textureSize /= 2;
 
             Logging.log("GL reported max texture size = %d", maxTextureSize);
-            Logging.log("texture size from config = %d", MWConfig.configTextureSize);
+            Logging.log("texture size from config = %d", ConfigurationHandler.mwConfig.configTextureSize());
             Logging.log("setting map texture size to = %d", textureSize);
 
             this.textureSize = textureSize;
@@ -161,15 +160,15 @@ public class Mw {
 
     // cheap and lazy way to teleport...
     public void teleportTo(int x, int y, int z) {
-        if (MWConfig.teleportEnabled) {
-            this.mc.player.sendChatMessage(String.format("/%s %d %d %d", MWConfig.teleportCommand, x, y, z));
+        if (ConfigurationHandler.mwConfig.teleportEnabled()) {
+            this.mc.player.sendChatMessage(String.format("/%s %d %d %d", ConfigurationHandler.mwConfig.teleportCommand(), x, y, z));
         } else {
             Utils.printBoth(I18n.translate("mw.msg.tpdisabled"));
         }
     }
 
     public void warpTo(String name) {
-        if (MWConfig.teleportEnabled) {
+        if (ConfigurationHandler.mwConfig.teleportEnabled()) {
             // MwUtil.printBoth(String.format("warping to %s", name));
             this.mc.player.sendChatMessage(String.format("/warp %s", name));
         } else {
@@ -178,7 +177,7 @@ public class Mw {
     }
 
     public void teleportToMapPos(MapView mapView, int x, int y, int z) {
-        if (!MWConfig.teleportCommand.equals("warp")) {
+        if (!ConfigurationHandler.mwConfig.teleportCommand().equals("warp")) {
             double scale = mapView.getDimensionScaling(this.playerDimension);
             this.teleportTo((int) (x / scale), y, (int) (z / scale));
         } else {
@@ -187,7 +186,7 @@ public class Mw {
     }
 
     public void teleportToMarker(Marker marker) {
-        if (MWConfig.teleportCommand.equals("warp")) {
+        if (ConfigurationHandler.mwConfig.teleportCommand().equals("warp")) {
             this.warpTo(marker.name);
         } else if (marker.dimension == this.playerDimension) {
             this.teleportTo(marker.x, marker.y, marker.z);
@@ -222,7 +221,7 @@ public class Mw {
         BlockColours bc = new BlockColours();
         File f = new File(this.configDir, MwReference.blockColourSaveFileName);
 
-        if (MWConfig.useSavedBlockColours && f.isFile() && bc.CheckFileVersion(f)) {
+        if (ConfigurationHandler.mwConfig.useSavedBlockColours() && f.isFile() && bc.CheckFileVersion(f)) {
             // load block colours from file
             Logging.logInfo("loading block colours from %s", f);
             bc.loadFromFile(f);
@@ -242,16 +241,16 @@ public class Mw {
         this.executor.addTask(new CloseRegionManagerTask(this.regionManager));
         this.executor.close();
         MapTexture oldMapTexture = this.mapTexture;
-        MapTexture newMapTexture = new MapTexture(this.textureSize, MWConfig.linearTextureScaling);
+        MapTexture newMapTexture = new MapTexture(this.textureSize, ConfigurationHandler.mwConfig.linearTextureScaling());
         this.mapTexture = newMapTexture;
         if (oldMapTexture != null) {
             oldMapTexture.close();
         }
         this.executor = new BackgroundExecutor();
-        this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours, MWConfig.zoomInLevels, MWConfig.zoomOutLevels);
+        this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours, ConfigurationHandler.mwConfig.zoomInLevels(), ConfigurationHandler.mwConfig.zoomOutLevels());
 
         UndergroundTexture oldTexture = this.undergroundMapTexture;
-        UndergroundTexture newTexture = new UndergroundTexture(this, this.textureSize, MWConfig.linearTextureScaling);
+        UndergroundTexture newTexture = new UndergroundTexture(this, this.textureSize, ConfigurationHandler.mwConfig.linearTextureScaling());
         this.undergroundMapTexture = newTexture;
         if (oldTexture != null) {
             this.undergroundMapTexture.close();
@@ -259,8 +258,8 @@ public class Mw {
     }
 
     public void toggleUndergroundMode() {
-        MWConfig.undergroundMode = !MWConfig.undergroundMode;
-        this.miniMap.view.setUndergroundMode(MWConfig.undergroundMode);
+        ConfigurationHandler.mwConfig.setProperty("undergroundMode", String.valueOf(!ConfigurationHandler.mwConfig.undergroundMode()));
+        this.miniMap.view.setUndergroundMode(ConfigurationHandler.mwConfig.undergroundMode());
     }
 
     // //////////////////////////////
@@ -282,12 +281,12 @@ public class Mw {
 
         // get world and image directories
         File saveDir = this.saveDir;
-        if (MWConfig.saveDirOverride.length() > 0) {
-            File d = new File(MWConfig.saveDirOverride);
+        if (ConfigurationHandler.mwConfig.saveDirOverride().length() > 0) {
+            File d = new File(ConfigurationHandler.mwConfig.saveDirOverride());
             if (d.isDirectory()) {
                 saveDir = d;
             } else {
-                Logging.log("error: no such directory %s", MWConfig.saveDirOverride);
+                Logging.log("error: no such directory %s", ConfigurationHandler.mwConfig.saveDirOverride());
             }
         }
 
@@ -320,11 +319,11 @@ public class Mw {
         this.executor = new BackgroundExecutor();
 
         // mapTexture depends on config being loaded
-        this.mapTexture = new MapTexture(this.textureSize, MWConfig.linearTextureScaling);
-        this.undergroundMapTexture = new UndergroundTexture(this, this.textureSize, MWConfig.linearTextureScaling);
+        this.mapTexture = new MapTexture(this.textureSize, ConfigurationHandler.mwConfig.linearTextureScaling());
+        this.undergroundMapTexture = new UndergroundTexture(this, this.textureSize, ConfigurationHandler.mwConfig.linearTextureScaling());
         // this.reloadBlockColours();
         // region manager depends on config, mapTexture, and block colours
-        this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours, MWConfig.zoomInLevels, MWConfig.zoomOutLevels);
+        this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours, ConfigurationHandler.mwConfig.zoomInLevels(), ConfigurationHandler.mwConfig.zoomOutLevels());
         // overlay manager depends on mapTexture
         this.miniMap = new MiniMap(this);
         this.miniMap.view.setDimension(this.mc.player.dimension);
@@ -394,7 +393,7 @@ public class Mw {
 
             this.updatePlayer();
 
-            if (MWConfig.undergroundMode && ((this.tickCounter % 30) == 0)) {
+            if (ConfigurationHandler.mwConfig.undergroundMode() && ((this.tickCounter % 30) == 0)) {
                 this.undergroundMapTexture.update();
             }
 
@@ -451,9 +450,9 @@ public class Mw {
     // from onTick when mc.currentScreen is an instance of GuiGameOver
     // it's the only option to detect death client side
     public void onPlayerDeath(PlayerEntity player) {
-        if (this.ready && (MWConfig.maxDeathMarkers > 0)) {
+        if (this.ready && (ConfigurationHandler.mwConfig.maxDeathMarkers() > 0)) {
             this.updatePlayer();
-            int deleteCount = (this.markerManager.countMarkersInGroup("playerDeaths") - MWConfig.maxDeathMarkers) + 1;
+            int deleteCount = (this.markerManager.countMarkersInGroup("playerDeaths") - ConfigurationHandler.mwConfig.maxDeathMarkers()) + 1;
             for (int i = 0; i < deleteCount; i++) {
                 // delete the first marker found in the group "playerDeaths".
                 // as new markers are only ever appended to the marker list this
@@ -487,7 +486,7 @@ public class Mw {
                 if (group.equals("none")) {
                     group = "group";
                 }
-                if (MWConfig.newMarkerDialog) {
+                if (ConfigurationHandler.mwConfig.newMarkerDialog()) {
                     this.mc.openScreen(new MwGuiMarkerDialogNew(null, this.markerManager, "", group, this.playerXInt, this.playerYInt, this.playerZInt, this.playerDimension));
                 } else {
                     this.mc.openScreen(new MwGuiMarkerDialog(null, this.markerManager, "", group, this.playerXInt, this.playerYInt, this.playerZInt, this.playerDimension));

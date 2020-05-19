@@ -1,6 +1,7 @@
 package dex.mapwriter3;
 
 import com.google.common.collect.Maps;
+import dex.mapwriter3.config.ConfigurationHandler;
 import dex.mapwriter3.config.MWConfig;
 import dex.mapwriter3.region.MwChunk;
 import dex.mapwriter3.tasks.SaveChunkTask;
@@ -105,7 +106,7 @@ public class ChunkManager {
     }
 
     public void updateSurfaceChunks() {
-        int chunksToUpdate = Math.min(this.chunkMap.size(), MWConfig.chunksPerTick);
+        int chunksToUpdate = Math.min(this.chunkMap.size(), ConfigurationHandler.mwConfig.chunksPerTick());
         MwChunk[] chunkArray = new MwChunk[chunksToUpdate];
         for (int i = 0; i < chunksToUpdate; i++) {
             Map.Entry<WorldChunk, Integer> entry = this.chunkMap.getNextEntry();
@@ -115,7 +116,7 @@ public class ChunkManager {
                 WorldChunk chunk = entry.getKey();
 
                 int flags = entry.getValue();
-                if (Utils.distToChunkSq(this.mw.playerXInt, this.mw.playerZInt, chunk) <= MWConfig.maxChunkSaveDistSq) {
+                if (Utils.distToChunkSq(this.mw.playerXInt, this.mw.playerZInt, chunk) <= ConfigurationHandler.mwConfig.maxChunkSaveDistSq()) {
                     flags |= (VISIBLE_FLAG | VIEWED_FLAG);
                 } else {
                     flags &= ~VISIBLE_FLAG;
@@ -146,7 +147,7 @@ public class ChunkManager {
     }
 
     private void addSaveChunkTask(WorldChunk chunk) {
-        if ((MinecraftClient.getInstance().isInSingleplayer() && MWConfig.regionFileOutputEnabledMP) || (!MinecraftClient.getInstance().isInSingleplayer() && MWConfig.regionFileOutputEnabledSP)) {
+        if ((MinecraftClient.getInstance().isInSingleplayer() && ConfigurationHandler.mwConfig.regionFileOutputEnabledMP()) || (!MinecraftClient.getInstance().isInSingleplayer() && ConfigurationHandler.mwConfig.regionFileOutputEnabledSP())) {
             if (!chunk.isEmpty()) {
                 this.mw.executor.addTask(new SaveChunkTask(copyToMwChunk(chunk), this.mw.regionManager));
             }
